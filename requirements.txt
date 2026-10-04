@@ -1,0 +1,2 @@
+pywebview>=6.0
+rarfile>=4.2

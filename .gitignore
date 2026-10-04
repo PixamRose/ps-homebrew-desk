@@ -1,0 +1,17 @@
+vendor/
+__pycache__/
+*.pyc
+.DS_Store
+.iconbuild/
+catalog/files/
+updates/*.zip
+updates/manifest.json
+cache/
+.venv/
+venv/
+payloads/*.elf
+payloads/*.bin
+payloads/*.pkg
+build/
+dist/
+*.spec.bak

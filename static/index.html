@@ -1,0 +1,707 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Homebrew Desk" />
+  <meta name="theme-color" content="#0A84FF" />
+  <title>PS Homebrew Desk</title>
+  <link rel="icon" type="image/png" href="/app-icon.png" />
+  <link rel="apple-touch-icon" href="/app-icon.png" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <script>
+    (() => {
+      const saved = localStorage.getItem("pshd-theme");
+      const dark = saved ? saved === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+      document.documentElement.dataset.theme = dark ? "dark" : "light";
+    })();
+  </script>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <!-- SF-style icon sprite -->
+  <svg xmlns="http://www.w3.org/2000/svg" class="icon-sprite" aria-hidden="true" focusable="false">
+    <symbol id="i-desk" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.75"/><path d="M8 20h8M12 16v4" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></symbol>
+    <symbol id="i-store" viewBox="0 0 24 24"><path d="M4 9h16l-1.2 10.2A2 2 0 0 1 16.8 21H7.2a2 2 0 0 1-2-1.8L4 9Z" fill="none" stroke="currentColor" stroke-width="1.75"/><path d="M8 9V7a4 4 0 0 1 8 0v2" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></symbol>
+    <symbol id="i-transfer" viewBox="0 0 24 24"><path d="M7 7h11M14 3l4 4-4 4M17 17H6M10 13l-4 4 4 4" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="M12 4v10" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/><path d="M8 10l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 18h14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></symbol>
+    <symbol id="i-files" viewBox="0 0 24 24"><path d="M3.5 8.5h6l2 2.5H20.5v9a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 20v-11.5Z" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/><path d="M3.5 8.5V6A1.5 1.5 0 0 1 5 4.5h5.2L12 7" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/></symbol>
+    <symbol id="i-games" viewBox="0 0 24 24"><path d="M8 9.5h8a5.5 5.5 0 1 1-2.2 10.5H10.2A5.5 5.5 0 1 1 8 9.5Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M9.2 14h2.2M10.3 12.9v2.2M15.6 13.2h.01M17.2 14.8h.01" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-elf" viewBox="0 0 24 24"><rect x="4" y="3.5" width="16" height="17" rx="3" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M8 8.2h8M8 12h5.5M8 15.8h3.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="16.2" cy="15.6" r="1.35" fill="currentColor"/></symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 5.5 13.5h5.2L10 22l8.2-12.8h-5.5L13 2Z" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/></symbol>
+    <symbol id="i-logs" viewBox="0 0 24 24"><path d="M7 5h12M7 12h12M7 19h8" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/><circle cx="4" cy="5" r="1.1" fill="currentColor"/><circle cx="4" cy="12" r="1.1" fill="currentColor"/><circle cx="4" cy="19" r="1.1" fill="currentColor"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.75"/><path d="M12 2.8v2.2M12 19v2.2M2.8 12h2.2M19 12h2.2M5.4 5.4l1.6 1.6M17 17l1.6 1.6M18.6 5.4 17 7M7 17l-1.6 1.6" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M19 14.5A7.5 7.5 0 1 1 9.5 5 6 6 0 0 0 19 14.5Z" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/></symbol>
+    <symbol id="i-connect" viewBox="0 0 24 24"><path d="M8.5 15.5a4.5 4.5 0 0 1 0-6.4l1.4 1.4a2.5 2.5 0 0 0 0 3.6l-1.4 1.4Zm7-7a4.5 4.5 0 0 1 0 6.4l-1.4-1.4a2.5 2.5 0 0 0 0-3.6l1.4-1.4Z" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/><path d="M10 12h4" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M14.5 5.5 8 12l6.5 6.5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-forward" viewBox="0 0 24 24"><path d="M9.5 5.5 16 12l-6.5 6.5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/><path d="M20 5v5h-5" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-folder-plus" viewBox="0 0 24 24"><path d="M3.5 8.5h6l2 2.5H20.5v8a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2v-10.5Z" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 13v5M9.5 15.5h5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+    <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3.5 8.5h6l2 2.5H20.5v9a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 20v-11.5Z" fill="currentColor" opacity=".14"/><path d="M3.5 8.5h6l2 2.5H20.5v9a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 20v-11.5Z" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+    <symbol id="i-doc" viewBox="0 0 24 24"><path d="M7 3.5h7l4 4V20a1.5 1.5 0 0 1-1.5 1.5H7A1.5 1.5 0 0 1 5.5 20V5A1.5 1.5 0 0 1 7 3.5Z" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M14 3.5V8h4.5" fill="none" stroke="currentColor" stroke-width="1.7"/></symbol>
+    <symbol id="i-pkg" viewBox="0 0 24 24"><path d="M12 3 20 7.5v9L12 21 4 16.5v-9L12 3Z" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 12 20 7.5M12 12 4 7.5M12 12v9" fill="none" stroke="currentColor" stroke-width="1.7"/></symbol>
+    <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 3.5v2.2M12 18.3v2.2M3.5 12h2.2M18.3 12h2.2M6 6l1.6 1.6M16.4 16.4 18 18M18 6l-1.6 1.6M7.6 16.4 6 18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+    <symbol id="i-usb" viewBox="0 0 24 24"><path d="M12 3v12" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/><circle cx="12" cy="18.5" r="2.2" fill="none" stroke="currentColor" stroke-width="1.75"/><path d="M12 8h4.5a2 2 0 0 1 2 2v1.5M12 11H8a2 2 0 0 0-2 2V15" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.2" fill="none" stroke="currentColor" stroke-width="1.75"/><path d="M5.5 19.5a6.5 6.5 0 0 1 13 0" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></symbol>
+    <symbol id="i-apps" viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="6.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.7"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.7"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.7"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.7"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 5 6.5v5.2c0 4.3 2.9 7.3 7 8.8 4.1-1.5 7-4.5 7-8.8V6.5L12 3Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></symbol>
+    <symbol id="i-disk" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M7 4.5v3.5h5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+    <symbol id="i-warning" viewBox="0 0 24 24"><path d="M12 4.5 21 19H3L12 4.5Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M12 10v4.5M12 17h.01" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-zip" viewBox="0 0 24 24"><path d="M7 3.5h7l4 4V20a1.5 1.5 0 0 1-1.5 1.5H7A1.5 1.5 0 0 1 5.5 20V5A1.5 1.5 0 0 1 7 3.5Z" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M12 8v.01M12 10.5v.01M12 13v.01M12 15.5v2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.75"/><path d="M16.2 16.2 21 21" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M7 7l10 10M17 7 7 17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  </svg>
+
+  <div class="app">
+    <button type="button" class="nav-burger" id="nav-burger" aria-label="Menu">☰</button>
+    <aside class="sidebar" id="sidebar">
+      <div class="side-brand">
+        <img class="app-icon-img" src="/app-icon.png" width="44" height="44" alt="PS Homebrew Desk" />
+        <div>
+          <strong>Homebrew Desk</strong>
+          <small id="side-platform-label">Companion</small>
+          <small class="side-author" id="side-author">by Pixam</small>
+        </div>
+      </div>
+      <nav class="side-nav">
+        <button class="nav-item active" data-tab="desk">
+          <svg class="ic" aria-hidden="true"><use href="#i-desk"/></svg>
+          <span>Desk</span>
+        </button>
+        <button class="nav-item" data-tab="store">
+          <svg class="ic" aria-hidden="true"><use href="#i-store"/></svg>
+          <span>Store</span>
+        </button>
+        <button class="nav-item" data-tab="transfer">
+          <svg class="ic" aria-hidden="true"><use href="#i-transfer"/></svg>
+          <span>Transfert</span>
+        </button>
+        <button class="nav-item" data-tab="link">
+          <svg class="ic" aria-hidden="true"><use href="#i-link"/></svg>
+          <span>Lien</span>
+        </button>
+        <button class="nav-item" data-tab="files">
+          <svg class="ic" aria-hidden="true"><use href="#i-files"/></svg>
+          <span>Fichiers</span>
+        </button>
+        <button class="nav-item" data-tab="games">
+          <svg class="ic" aria-hidden="true"><use href="#i-games"/></svg>
+          <span>Jeux</span>
+        </button>
+        <button class="nav-item" data-tab="elfs">
+          <svg class="ic" aria-hidden="true"><use href="#i-elf"/></svg>
+          <span>ELF</span>
+        </button>
+        <button class="nav-item" data-tab="relapse">
+          <svg class="ic" aria-hidden="true"><use href="#i-bolt"/></svg>
+          <span>Relapse</span>
+        </button>
+        <button class="nav-item" data-tab="logs">
+          <svg class="ic" aria-hidden="true"><use href="#i-logs"/></svg>
+          <span>Logs</span>
+        </button>
+      </nav>
+      <div class="side-foot">
+        <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Basculer le thème">
+          <svg class="ic" id="theme-ic-side" aria-hidden="true"><use href="#i-moon"/></svg>
+          <span id="theme-label">Mode sombre</span>
+        </button>
+        <div class="secure-badge">
+          <svg class="ic tiny" aria-hidden="true"><use href="#i-shield"/></svg>
+          <span>Écriture · <code>/data</code> <code>/user</code> <code>/mnt</code> · système en lecture seule</span>
+        </div>
+      </div>
+    </aside>
+
+    <section class="main">
+      <header class="toolbar">
+        <form id="connect-form" class="connect-bar" autocomplete="off">
+          <label class="field">
+            <span>Console</span>
+            <input id="host" value="" placeholder="IP PS5 (ex. 192.168.1.x)" spellcheck="false" />
+          </label>
+          <button type="submit" class="btn primary" id="connect-btn">
+            <svg class="ic" aria-hidden="true"><use href="#i-connect"/></svg>
+            <span>Connecter</span>
+          </button>
+        </form>
+        <div class="toolbar-right">
+          <button type="button" class="btn ghost theme-btn" id="theme-toggle-bar" aria-label="Basculer le thème">
+            <svg class="ic" id="theme-ic-bar" aria-hidden="true"><use href="#i-moon"/></svg>
+          </button>
+          <div id="conn-chip" class="conn-chip idle">Non connecté</div>
+        </div>
+      </header>
+      <div class="global-xfer" id="global-xfer" hidden>
+        <div class="global-xfer-meta">
+          <span class="global-xfer-phase" id="global-xfer-phase">—</span>
+          <span class="global-xfer-label" id="global-xfer-label">—</span>
+          <span class="global-xfer-pct" id="global-xfer-pct">0%</span>
+        </div>
+        <div class="progress-stack compact">
+          <div class="progress-lane">
+            <span class="progress-lane-label">DL</span>
+            <div class="progress-bar"><div class="progress-fill phase-download" id="global-dl-fill"></div></div>
+          </div>
+          <div class="progress-lane">
+            <span class="progress-lane-label" id="global-stage-label">Suite</span>
+            <div class="progress-bar"><div class="progress-fill phase-idle" id="global-stage-fill"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <section class="panel active" id="panel-desk">
+          <div class="status-row" id="status-strip">
+            <div class="pill" data-port="ftp_1337">FTP 1337</div>
+            <div class="pill" data-port="elfldr_9021">ELF 9021</div>
+            <div class="pill" data-port="http_9120">HTTP 9120</div>
+            <div class="pill" data-port="control_9048">CTRL 9048</div>
+          </div>
+          <p id="status-note" class="note">En attente de connexion…</p>
+
+          <div class="grid two">
+            <article class="surface dropzone" id="dropzone">
+              <h2>Déposer un .elf</h2>
+              <p>Glisse un fichier ici. Envoi uniquement vers <code>/data/homebrew</code>.</p>
+              <input type="file" id="file-input" />
+              <button type="button" class="btn" id="upload-btn">Envoyer sur la console</button>
+              <pre id="upload-result" class="result" hidden></pre>
+            </article>
+
+            <article class="surface">
+              <div class="row-between">
+                <h2>/data/homebrew</h2>
+                <button type="button" class="btn ghost" id="refresh-homebrew">Actualiser</button>
+              </div>
+              <ul id="homebrew-list" class="file-list"></ul>
+            </article>
+          </div>
+
+          <article class="surface">
+            <h2>Diagnostic</h2>
+            <ul id="warnings" class="bullets"></ul>
+            <ul id="hints" class="bullets muted"></ul>
+            <pre id="autoload-preview" class="result mono" hidden></pre>
+          </article>
+
+          <article class="surface" id="network-hub">
+            <div class="row-between">
+              <h2>Réseau &amp; mises à jour</h2>
+              <span class="note" id="desk-version-label">v— · by Pixam</span>
+            </div>
+            <p class="lede">
+              Lance le hub en mode LAN pour ouvrir Desk depuis un Windows, un Mac ou un iPhone
+              sur le même Wi‑Fi. Publie une mise à jour quand tu veux ; les autres appareils la récupèrent.
+            </p>
+            <div class="network-grid">
+              <div>
+                <p class="note">URL LAN</p>
+                <code id="desk-lan-url">—</code>
+                <div class="btn-row" style="margin-top:0.55rem">
+                  <button type="button" class="btn ghost" id="copy-lan-url">Copier l’URL</button>
+                  <button type="button" class="btn ghost" id="refresh-desk-info">Actualiser</button>
+                </div>
+              </div>
+              <div>
+                <p class="note">État</p>
+                <ul class="bullets" id="desk-network-bullets">
+                  <li>Chargement…</li>
+                </ul>
+              </div>
+            </div>
+            <div class="token-row" style="margin-top:0.85rem">
+              <label class="field">
+                <span>Token LAN <span class="note">(DESK_TOKEN — requis si le hub le demande)</span></span>
+                <input id="desk-token-input" type="password" autocomplete="off" placeholder="Colle le token ici" />
+              </label>
+              <div class="btn-row" style="margin-top:0.45rem">
+                <button type="button" class="btn ghost" id="save-desk-token">Enregistrer le token</button>
+                <button type="button" class="btn ghost" id="clear-desk-token">Effacer</button>
+                <button type="button" class="btn ghost" id="toggle-desk-token">Afficher</button>
+              </div>
+              <p class="note" id="desk-token-status" style="margin-top:0.35rem"></p>
+            </div>
+            <p class="note" id="extract-tools-hint" style="margin-top:0.7rem"></p>
+            <div class="btn-row" style="margin-top:0.85rem">
+              <button type="button" class="btn primary" id="publish-update-btn">Publier une mise à jour LAN</button>
+              <a class="btn ghost" id="download-update-link" href="/updates/latest.zip" hidden>Télécharger latest.zip</a>
+            </div>
+            <pre id="update-manifest-preview" class="result mono" hidden></pre>
+            <p class="note" id="iphone-hint" style="margin-top:0.7rem"></p>
+          </article>
+        </section>
+
+        <section class="panel" id="panel-store">
+          <article class="surface">
+            <div class="row-between">
+              <h2>Catalogue</h2>
+              <button type="button" class="btn ghost" id="refresh-catalog">Actualiser</button>
+            </div>
+            <p class="lede">
+              Miroir local de releases GitHub (
+              <a href="https://github.com/ps5-payload-dev" target="_blank" rel="noreferrer">ps5-payload-dev</a>,
+              <a href="https://github.com/etaHEN/etaHEN" target="_blank" rel="noreferrer">etaHEN</a>,
+              <a href="https://github.com/itsPLK" target="_blank" rel="noreferrer">itsPLK</a>
+              ) · SHA-256 vérifié · <code>/data/homebrew</code> only.
+            </p>
+            <div class="transfer-meta">
+              <label class="field">
+                <span>Recherche</span>
+                <input id="catalog-search" type="search" placeholder="ftp, websrv, etaHEN, media…" />
+              </label>
+              <p id="catalog-count" class="note"></p>
+            </div>
+            <div id="catalog-list" class="catalog"></div>
+          </article>
+        </section>
+
+        <section class="panel" id="panel-transfer">
+          <article class="surface xfer-panel">
+            <div class="xfer-hero">
+              <div>
+                <p class="elfs-kicker">Mac → console</p>
+                <h2>Transfert</h2>
+                <p class="lede">
+                  Glisse des fichiers ou dossiers ici, choisis la destination, envoie en FTP parallèle.
+                  Les <code>.pkg</code> / <code>.fpkg</code> vers homebrew partent dans <code>pkgs/</code>.
+                </p>
+              </div>
+              <div class="xfer-stat-pills">
+                <div class="elf-stat"><strong id="xfer-stat-items">0</strong><span>éléments</span></div>
+                <div class="elf-stat"><strong id="xfer-stat-size">0</strong><span>volume</span></div>
+              </div>
+            </div>
+
+            <div class="xfer-drop" id="xfer-dropzone" tabindex="0">
+              <div class="xfer-drop-inner">
+                <div class="xfer-drop-icon" aria-hidden="true">
+                  <svg class="ic" style="width:2rem;height:2rem"><use href="#i-transfer"/></svg>
+                </div>
+                <h3>Dépose fichiers &amp; dossiers</h3>
+                <p>ou choisis ci-dessous · upload vers la destination sélectionnée</p>
+                <div class="btn-row xfer-pick-row">
+                  <button type="button" class="btn primary" id="pick-folder-btn">Dossier</button>
+                  <button type="button" class="btn primary" id="pick-pkg-btn">PKG / FPKG</button>
+                  <label class="btn ghost file-label">
+                    Fichiers
+                    <input type="file" id="multi-input" multiple accept=".pkg,.fpkg,.elf,.zip,.bin,.rar,.7z,*/*" hidden />
+                  </label>
+                  <label class="btn ghost file-label">
+                    Dossier (web)
+                    <input type="file" id="folder-input" webkitdirectory multiple hidden />
+                  </label>
+                </div>
+              </div>
+              <ul id="xfer-file-list" class="xfer-file-list" hidden></ul>
+            </div>
+
+            <div class="xfer-controls">
+              <label class="field">
+                <span>Destination console</span>
+                <select id="xfer-dest-preset">
+                  <option value="/data/homebrew">/data/homebrew</option>
+                  <option value="/data/homebrew/pkgs">/data/homebrew/pkgs</option>
+                  <option value="/data">/data</option>
+                  <option value="/user">/user</option>
+                  <option value="/user/app">/user/app</option>
+                  <option value="/mnt/usb0">/mnt/usb0</option>
+                  <option value="__custom__">Chemin personnalisé…</option>
+                </select>
+              </label>
+              <label class="field" id="xfer-dest-custom-wrap" hidden>
+                <span>Chemin</span>
+                <input id="xfer-dest-custom" type="text" placeholder="/data/homebrew" spellcheck="false" />
+              </label>
+              <label class="field inline">
+                <span>Workers</span>
+                <input id="transfer-workers" type="number" min="1" max="6" value="3" />
+              </label>
+              <div class="xfer-actions">
+                <button type="button" class="btn ghost" id="xfer-clear-btn" disabled>Vider</button>
+                <button type="button" class="btn ghost danger" id="xfer-cancel-btn" hidden>Annuler</button>
+                <button type="button" class="btn primary" id="start-transfer-btn" disabled>Envoyer</button>
+              </div>
+            </div>
+            <p id="transfer-selection" class="note xfer-selection">Rien à envoyer — glisse ou choisis des fichiers.</p>
+
+            <div class="progress-wrap" id="transfer-progress-wrap" hidden>
+              <div class="progress-stack">
+                <div class="progress-lane">
+                  <div class="progress-lane-head">
+                    <span class="progress-lane-label">Upload FTP</span>
+                    <span class="progress-lane-pct" id="transfer-stage-pct">0%</span>
+                  </div>
+                  <div class="progress-bar tall"><div class="progress-fill phase-upload" id="transfer-fill"></div></div>
+                </div>
+              </div>
+              <p class="progress-phase-note" id="transfer-phase-note">En attente…</p>
+              <pre id="transfer-status" class="result mono"></pre>
+            </div>
+          </article>
+        </section>
+
+        <section class="panel" id="panel-link">
+          <article class="surface">
+            <h2>Télécharger un lien → console</h2>
+            <p class="lede">
+              Colle une URL directe (ELF, PKG, FPKG, RAR, ZIP…). Cet appareil télécharge ; les
+              <strong>.rar / .zip / .7z</strong> sont <strong>extraits ici</strong> (Keka sur Mac) puis
+              uploadés en FTP — pas sur la PS5. Destination sous <code>/data</code>, <code>/user</code>, <code>/mnt</code>…
+            </p>
+            <form id="link-form" class="link-form" autocomplete="off">
+              <label class="field wide">
+                <span>URL</span>
+                <input id="link-url" type="url" placeholder="https://…/payload.elf" required />
+              </label>
+              <label class="field wide">
+                <span>Nom fichier (optionnel)</span>
+                <input id="link-filename" type="text" placeholder="auto depuis l’URL" />
+              </label>
+              <label class="field wide">
+                <span>Mot de passe archive (RAR / ZIP / 7z)</span>
+                <input id="link-password" type="password" placeholder="laisser vide si aucun" autocomplete="off" />
+              </label>
+              <label class="check-row">
+                <input type="checkbox" id="link-no-extract" />
+                <span>Ne pas extraire — envoyer l’archive brute (si Keka plante sur les gros RAR)</span>
+              </label>
+              <div class="link-dest-row">
+                <label class="field wide">
+                  <span>Destination sur la console</span>
+                  <select id="link-dest-preset">
+                    <option value="/data/homebrew">/data/homebrew</option>
+                    <option value="/data/homebrew/pkgs">/data/homebrew/pkgs</option>
+                    <option value="/data">/data</option>
+                    <option value="/data/etaHEN">/data/etaHEN</option>
+                    <option value="/user">/user</option>
+                    <option value="/user/app">/user/app (apps installées)</option>
+                    <option value="/mnt/usb0">/mnt/usb0</option>
+                    <option value="__custom__">Chemin personnalisé…</option>
+                  </select>
+                </label>
+                <label class="field wide" id="link-dest-custom-wrap" hidden>
+                  <span>Chemin personnalisé</span>
+                  <input id="link-dest-custom" type="text" list="link-dest-suggestions" placeholder="/data/homebrew" spellcheck="false" />
+                  <datalist id="link-dest-suggestions">
+                    <option value="/data/homebrew"></option>
+                    <option value="/data/homebrew/pkgs"></option>
+                    <option value="/data"></option>
+                    <option value="/user/app"></option>
+                    <option value="/mnt/usb0"></option>
+                  </datalist>
+                </label>
+              </div>
+              <p class="note" id="link-dest-hint">Les PKG/FPKG iront dans <code>/data/homebrew/pkgs</code>.</p>
+              <div class="btn-row">
+                <button type="submit" class="btn primary" id="link-start-btn">Télécharger &amp; envoyer</button>
+                <button type="button" class="btn ghost danger" id="link-cancel-btn" hidden>Annuler</button>
+              </div>
+            </form>
+            <div class="progress-wrap" id="link-progress-wrap" hidden>
+              <div class="progress-stack">
+                <div class="progress-lane">
+                  <div class="progress-lane-head">
+                    <span class="progress-lane-label">Téléchargement</span>
+                    <span class="progress-lane-pct" id="link-dl-pct">0%</span>
+                  </div>
+                  <div class="progress-bar tall"><div class="progress-fill phase-download" id="link-dl-fill"></div></div>
+                </div>
+                <div class="progress-lane">
+                  <div class="progress-lane-head">
+                    <span class="progress-lane-label" id="link-stage-label">Extraction / Upload</span>
+                    <span class="progress-lane-pct" id="link-stage-pct">—</span>
+                  </div>
+                  <div class="progress-bar tall"><div class="progress-fill phase-idle" id="link-stage-fill"></div></div>
+                </div>
+              </div>
+              <p class="progress-phase-note" id="link-phase-note">En attente…</p>
+              <pre id="link-status" class="result mono"></pre>
+            </div>
+          </article>
+        </section>
+
+        <section class="panel" id="panel-files">
+          <article class="surface finder">
+            <div class="finder-toolbar">
+              <div class="btn-row finder-nav">
+                <button type="button" class="btn ghost icon-btn" id="finder-back" title="Retour"><svg class="ic"><use href="#i-back"/></svg></button>
+                <button type="button" class="btn ghost icon-btn" id="finder-forward" title="Avant" disabled><svg class="ic"><use href="#i-forward"/></svg></button>
+                <button type="button" class="btn ghost icon-btn" id="finder-refresh" title="Actualiser"><svg class="ic"><use href="#i-refresh"/></svg></button>
+              </div>
+              <div class="finder-crumbs" id="finder-crumbs"></div>
+              <div class="finder-search">
+                <svg class="ic search-ic" aria-hidden="true"><use href="#i-search"/></svg>
+                <input id="finder-search" type="search" placeholder="Rechercher ici… Entrée = sous-dossiers" autocomplete="off" spellcheck="false" />
+                <button type="button" class="btn ghost icon-btn" id="finder-search-clear" title="Effacer" hidden><svg class="ic"><use href="#i-x"/></svg></button>
+                <button type="button" class="btn ghost" id="finder-search-deep" title="Chercher dans les sous-dossiers">Sous-dossiers</button>
+              </div>
+              <div class="btn-row finder-actions">
+                <button type="button" class="btn ghost" id="finder-new-folder" title="Nouveau dossier"><svg class="ic"><use href="#i-folder-plus"/></svg><span>Dossier</span></button>
+                <button type="button" class="btn ghost" id="finder-rename" title="Renommer" disabled>Renommer</button>
+                <button type="button" class="btn ghost" id="finder-cut" title="Couper" disabled>Couper</button>
+                <button type="button" class="btn ghost" id="finder-copy" title="Copier" disabled>Copier</button>
+                <button type="button" class="btn ghost" id="finder-paste" title="Coller" disabled>Coller</button>
+                <button type="button" class="btn ghost" id="finder-move-to" title="Déplacer vers…" disabled>Déplacer…</button>
+                <button type="button" class="btn ghost danger" id="finder-delete" title="Supprimer" disabled>Supprimer</button>
+              </div>
+            </div>
+            <div class="finder-body">
+              <aside class="finder-favs">
+                <div class="fav-label">Favoris</div>
+                <button type="button" class="fav write" data-path="/data"><svg class="ic fav-ic"><use href="#i-disk"/></svg> Data</button>
+                <button type="button" class="fav write" data-path="/data/homebrew"><svg class="ic fav-ic"><use href="#i-folder"/></svg> Homebrew</button>
+                <button type="button" class="fav write" data-path="/data/homebrew/pkgs"><svg class="ic fav-ic"><use href="#i-pkg"/></svg> PKGs</button>
+                <button type="button" class="fav write" data-path="/data/etaHEN"><svg class="ic fav-ic"><use href="#i-bolt"/></svg> etaHEN</button>
+                <button type="button" class="fav write" data-path="/data/OnionHEN"><svg class="ic fav-ic"><use href="#i-gear"/></svg> OnionHEN</button>
+                <button type="button" class="fav write" data-path="/data/ps5_autoloader"><svg class="ic fav-ic"><use href="#i-refresh"/></svg> Autoloader</button>
+                <button type="button" class="fav write" data-path="/data/shadowmount"><svg class="ic fav-ic"><use href="#i-disk"/></svg> ShadowMount</button>
+                <button type="button" class="fav write" data-path="/user"><svg class="ic fav-ic"><use href="#i-user"/></svg> User</button>
+                <button type="button" class="fav write" data-path="/user/app"><svg class="ic fav-ic"><use href="#i-apps"/></svg> Apps installées</button>
+                <button type="button" class="fav write" data-path="/mnt/usb0"><svg class="ic fav-ic"><use href="#i-usb"/></svg> USB0</button>
+                <div class="fav-label">Lecture seule</div>
+                <button type="button" class="fav" data-path="/system"><svg class="ic fav-ic"><use href="#i-warning"/></svg> System</button>
+                <button type="button" class="fav" data-path="/"><svg class="ic fav-ic"><use href="#i-disk"/></svg> Root</button>
+              </aside>
+              <div class="finder-list-wrap" id="finder-drop-zone">
+                <div class="finder-head">
+                  <span>Nom</span>
+                  <span>Taille</span>
+                  <span>Type</span>
+                </div>
+                <div id="finder-list" class="finder-list" tabindex="0"></div>
+              </div>
+            </div>
+            <div class="finder-progress" id="finder-progress" hidden>
+              <div class="finder-progress-track">
+                <div class="finder-progress-fill" id="finder-progress-fill"></div>
+              </div>
+              <div class="finder-progress-meta">
+                <span id="finder-progress-label">En cours…</span>
+                <span id="finder-progress-pct">0%</span>
+              </div>
+            </div>
+            <div class="finder-status">
+              <span id="finder-writable-badge" class="finder-badge">—</span>
+              <span id="finder-status-text" class="note">Sélectionne un élément · glisse vers un dossier pour déplacer</span>
+            </div>
+          </article>
+        </section>
+
+        <div id="finder-menu" class="ctx-menu" hidden>
+          <button type="button" data-act="open">Ouvrir</button>
+          <button type="button" data-act="new">Nouveau dossier</button>
+          <hr />
+          <button type="button" data-act="cut">Couper</button>
+          <button type="button" data-act="copy">Copier</button>
+          <button type="button" data-act="paste">Coller</button>
+          <button type="button" data-act="move">Déplacer vers…</button>
+          <hr />
+          <button type="button" data-act="rename">Renommer</button>
+          <button type="button" data-act="delete" class="danger">Supprimer</button>
+        </div>
+
+        <section class="panel" id="panel-games">
+          <article class="surface games-panel">
+            <div class="row-between">
+              <div>
+                <h2>Jeux</h2>
+                <p class="lede">
+                  Scan FTP de <code>/user/app</code>, <code>/data/homebrew</code>, USB…
+                  Affiche TITLEID (ex. <code>PPSA03525</code>) et jaquette <code>sce_sys/icon0.png</code>.
+                </p>
+              </div>
+              <div class="btn-row">
+                <button type="button" class="btn ghost" id="games-refresh-btn">Actualiser</button>
+              </div>
+            </div>
+            <div class="transfer-meta">
+              <label class="field">
+                <span>Recherche</span>
+                <input id="games-search" type="search" placeholder="PPSA, nom, chemin…" />
+              </label>
+              <p id="games-count" class="note">—</p>
+            </div>
+            <div id="games-grid" class="games-grid"></div>
+          </article>
+
+          <aside class="surface games-detail" id="games-detail" hidden>
+            <div class="games-detail-head">
+              <img id="games-detail-cover" alt="" />
+              <div>
+                <h3 id="games-detail-title">—</h3>
+                <p class="games-tid" id="games-detail-tid">—</p>
+                <p class="note" id="games-detail-source">—</p>
+              </div>
+            </div>
+            <div class="games-tabs">
+              <button type="button" class="games-tab active" data-gtab="info">Infos</button>
+              <button type="button" class="games-tab" data-gtab="files">Fichiers</button>
+            </div>
+            <div id="games-tab-info" class="games-tab-panel">
+              <ul class="bullets" id="games-detail-bullets"></ul>
+              <pre id="games-detail-path" class="result mono"></pre>
+            </div>
+            <div id="games-tab-files" class="games-tab-panel" hidden>
+              <pre id="games-detail-files" class="result mono tall"></pre>
+            </div>
+            <div class="btn-row" style="margin-top:0.85rem">
+              <button type="button" class="btn ghost" id="games-open-folder-btn">Ouvrir dans Fichiers</button>
+              <button type="button" class="btn ghost danger" id="games-uninstall-btn">Désinstaller</button>
+              <button type="button" class="btn ghost" id="games-detail-close">Fermer</button>
+            </div>
+          </aside>
+        </section>
+
+        <section class="panel" id="panel-elfs">
+          <article class="surface elfs-panel">
+            <div class="elfs-hero">
+              <div>
+                <p class="elfs-kicker">Payloads · console &amp; Mac</p>
+                <h2>ELF</h2>
+                <p class="lede">
+                  Gère tes <code>.elf</code> : version, GitHub, mise à jour catalogue en un clic,
+                  désinstallation propre.
+                </p>
+              </div>
+              <div class="elfs-stats" id="elfs-stats">
+                <div class="elf-stat"><strong id="elfs-stat-total">0</strong><span>détectés</span></div>
+                <div class="elf-stat accent"><strong id="elfs-stat-updates">0</strong><span>MAJ</span></div>
+                <div class="elf-stat"><strong id="elfs-stat-local">0</strong><span>locaux</span></div>
+              </div>
+            </div>
+            <div class="elfs-toolbar">
+              <div class="elfs-filters" id="elfs-filters">
+                <button type="button" class="elf-chip active" data-filter="all">Tous</button>
+                <button type="button" class="elf-chip" data-filter="updates">MAJ dispo</button>
+                <button type="button" class="elf-chip" data-filter="console">Console</button>
+                <button type="button" class="elf-chip" data-filter="local">Mac</button>
+              </div>
+              <div class="btn-row">
+                <label class="field elfs-search-field">
+                  <span>Recherche</span>
+                  <input id="elfs-search" type="search" placeholder="ftpsrv, etaHEN, version…" />
+                </label>
+                <button type="button" class="btn ghost" id="elfs-refresh-btn">Actualiser</button>
+              </div>
+            </div>
+            <p id="elfs-count" class="note">—</p>
+            <div id="elfs-grid" class="elfs-grid"></div>
+          </article>
+
+          <aside class="surface elfs-detail" id="elfs-detail" hidden>
+            <div class="elfs-detail-orb" id="elfs-detail-orb" aria-hidden="true"></div>
+            <div class="elfs-detail-head">
+              <div class="elf-avatar lg" id="elfs-detail-avatar">ELF</div>
+              <div>
+                <h3 id="elfs-detail-title">—</h3>
+                <p class="elfs-ver" id="elfs-detail-ver">—</p>
+                <p class="note" id="elfs-detail-meta">—</p>
+              </div>
+            </div>
+            <ul class="bullets" id="elfs-detail-bullets"></ul>
+            <pre id="elfs-detail-path" class="result mono"></pre>
+            <div class="btn-row wrap" style="margin-top:0.85rem">
+              <button type="button" class="btn primary" id="elfs-update-btn" hidden>Mettre à jour</button>
+              <a class="btn ghost" id="elfs-github-btn" href="#" target="_blank" rel="noreferrer" hidden>GitHub</a>
+              <button type="button" class="btn ghost" id="elfs-send-btn">Envoyer → elfldr</button>
+              <button type="button" class="btn ghost" id="elfs-open-folder-btn">Ouvrir dossier</button>
+              <button type="button" class="btn ghost danger" id="elfs-uninstall-btn">Désinstaller</button>
+              <button type="button" class="btn ghost" id="elfs-detail-close">Fermer</button>
+            </div>
+          </aside>
+        </section>
+
+        <section class="panel" id="panel-relapse">
+          <article class="surface">
+            <h2>Relapse Exploit</h2>
+            <p class="lede">
+              Héberge <a href="https://github.com/ntfargo/Relapse-Exploit" target="_blank" rel="noreferrer">Relapse-Exploit</a>
+              sur ton Mac. Sur la PS5, ouvre l’URL dans Safari une fois la console détectée.
+            </p>
+            <div class="status-row" id="relapse-pills">
+              <div class="pill" id="relapse-console-pill">Console</div>
+              <div class="pill" id="relapse-elfldr-pill">ELF 9021</div>
+              <div class="pill" id="relapse-ftp-pill">FTP 1337</div>
+              <div class="pill" id="relapse-ready-pill">Fichiers</div>
+              <div class="pill" id="relapse-server-pill">Serveur</div>
+            </div>
+            <div class="relapse-url-card">
+              <span class="label">URL à ouvrir sur la console</span>
+              <code id="relapse-url">—</code>
+              <div class="btn-row">
+                <button type="button" class="btn ghost" id="relapse-copy-btn">Copier l’URL</button>
+                <button type="button" class="btn ghost" id="relapse-refresh-btn">Rafraîchir statut</button>
+              </div>
+            </div>
+            <div class="transfer-meta">
+              <label class="field inline">
+                <span>Port</span>
+                <input id="relapse-port" type="number" min="1" max="65535" value="8000" />
+              </label>
+              <p id="relapse-note" class="note">Connecte la console puis lance Relapse.</p>
+            </div>
+            <div class="btn-row">
+              <button type="button" class="btn ghost" id="relapse-setup-btn">Télécharger Relapse</button>
+              <button type="button" class="btn primary" id="relapse-start-btn">Lancer le serveur</button>
+              <button type="button" class="btn" id="relapse-stop-btn">Arrêter</button>
+            </div>
+
+            <hr class="sep" />
+            <h3>Après Relapse → charger HEN (FTP)</h3>
+            <p class="lede">
+              Relapse ne démarre que <strong>elfldr :9021</strong>. Le FTP arrive quand tu envoies
+              <strong>etaHEN.elf</strong> (13.60) sur ce port.
+            </p>
+            <p class="note">Place ton ELF dans <code>pshomebrew-desk/payloads/</code> ou choisis un fichier.</p>
+            <div class="btn-row wrap">
+              <input id="hen-elf-input" type="file" accept=".elf,application/octet-stream" hidden />
+              <button type="button" class="btn ghost" id="hen-pick-btn">Choisir etaHEN.elf</button>
+              <button type="button" class="btn primary" id="hen-send-btn" disabled>Envoyer → :9021</button>
+              <button type="button" class="btn ghost" id="hen-refresh-payloads-btn">Rafraîchir payloads</button>
+            </div>
+            <div class="hen-auto-box">
+              <label class="check">
+                <input type="checkbox" id="hen-auto-send" />
+                Envoyer auto l’ELF quand elfldr :9021 apparaît (après Relapse)
+              </label>
+              <label class="field inline">
+                <span>ELF auto</span>
+                <select id="hen-auto-file">
+                  <option value="">— choisir —</option>
+                </select>
+              </label>
+              <p class="note" id="hen-auto-note">Off — envoi manuel uniquement.</p>
+            </div>
+            <ul id="hen-payload-list" class="simple-list"></ul>
+            <pre id="hen-send-result" class="result mono" hidden></pre>
+
+            <pre id="relapse-status" class="result mono" hidden></pre>
+          </article>
+        </section>
+
+        <section class="panel" id="panel-logs">
+          <article class="surface">
+            <div class="row-between wrap">
+              <h2>Logs console</h2>
+              <div class="btn-row">
+                <button type="button" class="btn ghost log-btn" data-log="etahen">etaHEN</button>
+                <button type="button" class="btn ghost log-btn" data-log="util">util</button>
+                <button type="button" class="btn ghost log-btn" data-log="onionhen">OnionHEN</button>
+                <button type="button" class="btn ghost log-btn" data-log="shadowmount">ShadowMount</button>
+                <button type="button" class="btn ghost log-btn" data-log="autoload">autoload</button>
+              </div>
+            </div>
+            <pre id="log-view" class="result mono tall">Choisis un log…</pre>
+          </article>
+        </section>
+      </div>
+    </section>
+  </div>
+
+  <div id="toast" class="toast" hidden></div>
+  <script src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,1739 @@
+{
+  "title": "PS Homebrew Desk — grand catalogue de confiance",
+  "note": "Miroir local de releases GitHub officielles (ps5-payload-dev, etaHEN, itsPLK). SHA-256 vérifié. Install → /data/homebrew. Compat 13.60 : vérifie chaque release.",
+  "sources": [
+    {
+      "name": "etaHEN/etaHEN",
+      "url": "https://github.com/etaHEN/etaHEN"
+    },
+    {
+      "name": "itsPLK/ps5-elfldr",
+      "url": "https://github.com/itsPLK/ps5-elfldr"
+    },
+    {
+      "name": "itsPLK/ps5-payload-manager",
+      "url": "https://github.com/itsPLK/ps5-payload-manager"
+    },
+    {
+      "name": "itsPLK/ps5-unified-autoloader",
+      "url": "https://github.com/itsPLK/ps5-unified-autoloader"
+    },
+    {
+      "name": "ps5-payload-dev/elfldr",
+      "url": "https://github.com/ps5-payload-dev/elfldr"
+    },
+    {
+      "name": "ps5-payload-dev/fetchpkg",
+      "url": "https://github.com/ps5-payload-dev/fetchpkg"
+    },
+    {
+      "name": "ps5-payload-dev/ftpsrv",
+      "url": "https://github.com/ps5-payload-dev/ftpsrv"
+    },
+    {
+      "name": "ps5-payload-dev/gdbsrv",
+      "url": "https://github.com/ps5-payload-dev/gdbsrv"
+    },
+    {
+      "name": "ps5-payload-dev/klogsrv",
+      "url": "https://github.com/ps5-payload-dev/klogsrv"
+    },
+    {
+      "name": "ps5-payload-dev/launchpad",
+      "url": "https://github.com/ps5-payload-dev/launchpad"
+    },
+    {
+      "name": "ps5-payload-dev/linkdev",
+      "url": "https://github.com/ps5-payload-dev/linkdev"
+    },
+    {
+      "name": "ps5-payload-dev/offact",
+      "url": "https://github.com/ps5-payload-dev/offact"
+    },
+    {
+      "name": "ps5-payload-dev/pacbrew-repo",
+      "url": "https://github.com/ps5-payload-dev/pacbrew-repo"
+    },
+    {
+      "name": "ps5-payload-dev/plutotv",
+      "url": "https://github.com/ps5-payload-dev/plutotv"
+    },
+    {
+      "name": "ps5-payload-dev/shsrv",
+      "url": "https://github.com/ps5-payload-dev/shsrv"
+    },
+    {
+      "name": "ps5-payload-dev/svtplay",
+      "url": "https://github.com/ps5-payload-dev/svtplay"
+    },
+    {
+      "name": "ps5-payload-dev/tv4play",
+      "url": "https://github.com/ps5-payload-dev/tv4play"
+    },
+    {
+      "name": "ps5-payload-dev/tvhp",
+      "url": "https://github.com/ps5-payload-dev/tvhp"
+    },
+    {
+      "name": "ps5-payload-dev/websrv",
+      "url": "https://github.com/ps5-payload-dev/websrv"
+    }
+  ],
+  "items": [
+    {
+      "id": "linkdev-v0_2-linkdev_elf",
+      "name": "linkdev v0.2 · LinkDev.elf",
+      "summary": "Compte / devices · ps5-payload-dev/linkdev",
+      "tags": [
+        "account",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "LinkDev.elf",
+      "url": "/catalog/files/LinkDev.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/linkdev/releases/download/v0.2/LinkDev.zip",
+      "sha256": "e56b8490a46db68e047f6d4e5238c97f29860fd38f721d4672f5a057f8310fb9",
+      "source": "https://github.com/ps5-payload-dev/linkdev",
+      "version": "v0.2",
+      "bytes": 6520408,
+      "enabled": true
+    },
+    {
+      "id": "offact-v0_4-offact-6ef5ffff_elf",
+      "name": "offact v0.4 · OffAct.elf",
+      "summary": "Compte / devices · ps5-payload-dev/offact",
+      "tags": [
+        "account",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "OffAct-6ef5ffff.elf",
+      "url": "/catalog/files/OffAct-6ef5ffff.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/offact/releases/download/v0.4/OffAct.zip",
+      "sha256": "6ef5ffffdf2ce48f94acc67b3e0547fe6e4e0e9a61dc34f807c08bf595922c1c",
+      "source": "https://github.com/ps5-payload-dev/offact",
+      "version": "v0.4",
+      "bytes": 6549120,
+      "enabled": true
+    },
+    {
+      "id": "offact-v0_4_1-offact-2e3cd710_elf",
+      "name": "offact v0.4.1 · OffAct.elf",
+      "summary": "Compte / devices · ps5-payload-dev/offact",
+      "tags": [
+        "account",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "OffAct-2e3cd710.elf",
+      "url": "/catalog/files/OffAct-2e3cd710.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/offact/releases/download/v0.4.1/OffAct.zip",
+      "sha256": "2e3cd71083d1c29d3113000bf77609159e1c8a69678ee2db8c87dcb5ab4ae41f",
+      "source": "https://github.com/ps5-payload-dev/offact",
+      "version": "v0.4.1",
+      "bytes": 6549256,
+      "enabled": true
+    },
+    {
+      "id": "offact-v0_4_2-offact_elf",
+      "name": "offact v0.4.2 · OffAct.elf",
+      "summary": "Compte / devices · ps5-payload-dev/offact",
+      "tags": [
+        "account",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "OffAct.elf",
+      "url": "/catalog/files/OffAct.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/offact/releases/download/v0.4.2/OffAct.zip",
+      "sha256": "db250c1f3cf01b879d0d5e22e77b2e24c096ba1e2da20ead2ab758165ba5ab4f",
+      "source": "https://github.com/ps5-payload-dev/offact",
+      "version": "v0.4.2",
+      "bytes": 6549256,
+      "enabled": true
+    },
+    {
+      "id": "gdbsrv-v0_7-gdbsrv-ps5-b04b473f_elf",
+      "name": "gdbsrv v0.7 · gdbsrv-ps5.elf",
+      "summary": "GDB · ps5-payload-dev/gdbsrv",
+      "tags": [
+        "debug",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "gdbsrv-ps5-b04b473f.elf",
+      "url": "/catalog/files/gdbsrv-ps5-b04b473f.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/gdbsrv/releases/download/v0.7/gdbsrv-ps5.elf",
+      "sha256": "b04b473fc1a6aa61d208662174c35de0736c7100972d4f6aac45052c2cb9ff50",
+      "source": "https://github.com/ps5-payload-dev/gdbsrv",
+      "version": "v0.7",
+      "bytes": 156776,
+      "enabled": true
+    },
+    {
+      "id": "gdbsrv-v0_8-gdbsrv-ps5-7621b829_elf",
+      "name": "gdbsrv v0.8 · gdbsrv-ps5.elf",
+      "summary": "GDB · ps5-payload-dev/gdbsrv",
+      "tags": [
+        "debug",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "gdbsrv-ps5-7621b829.elf",
+      "url": "/catalog/files/gdbsrv-ps5-7621b829.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/gdbsrv/releases/download/v0.8/gdbsrv-ps5.elf",
+      "sha256": "7621b829bd8b6d6f3d2328fa12c16af956b0ca128250f92a91eddc100c87f208",
+      "source": "https://github.com/ps5-payload-dev/gdbsrv",
+      "version": "v0.8",
+      "bytes": 173480,
+      "enabled": true
+    },
+    {
+      "id": "gdbsrv-v0_9-gdbsrv-ps5_elf",
+      "name": "gdbsrv v0.9 · gdbsrv-ps5.elf",
+      "summary": "GDB · ps5-payload-dev/gdbsrv",
+      "tags": [
+        "debug",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "gdbsrv-ps5.elf",
+      "url": "/catalog/files/gdbsrv-ps5.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/gdbsrv/releases/download/v0.9/gdbsrv-ps5.elf",
+      "sha256": "80952d75f423768b95385f0944e5a5c2f417dcc10c22c1bb6516a923ad8894e5",
+      "source": "https://github.com/ps5-payload-dev/gdbsrv",
+      "version": "v0.9",
+      "bytes": 174248,
+      "enabled": true
+    },
+    {
+      "id": "klogsrv-v0_7_2-klogsrv-ps5-c932fd18_elf",
+      "name": "klogsrv v0.7.2 · klogsrv-ps5.elf",
+      "summary": "klog · ps5-payload-dev/klogsrv",
+      "tags": [
+        "debug",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "klogsrv-ps5-c932fd18.elf",
+      "url": "/catalog/files/klogsrv-ps5-c932fd18.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/klogsrv/releases/download/v0.7.2/klogsrv-ps5.elf",
+      "sha256": "c932fd185bc0e7e24beb45ebe2ddc88940c7ff15c589ed4ae7fe6086157c69d2",
+      "source": "https://github.com/ps5-payload-dev/klogsrv",
+      "version": "v0.7.2",
+      "bytes": 135160,
+      "enabled": true
+    },
+    {
+      "id": "klogsrv-v0_8-klogsrv-ps5-f6eb1b41_elf",
+      "name": "klogsrv v0.8 · klogsrv-ps5.elf",
+      "summary": "klog · ps5-payload-dev/klogsrv",
+      "tags": [
+        "debug",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "klogsrv-ps5-f6eb1b41.elf",
+      "url": "/catalog/files/klogsrv-ps5-f6eb1b41.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/klogsrv/releases/download/v0.8/klogsrv-ps5.elf",
+      "sha256": "f6eb1b415ecf3340b89a56a0cb04ba5c714430085851ada13a98012b63a5a4cf",
+      "source": "https://github.com/ps5-payload-dev/klogsrv",
+      "version": "v0.8",
+      "bytes": 135248,
+      "enabled": true
+    },
+    {
+      "id": "klogsrv-v0_9-klogsrv-ps5_elf",
+      "name": "klogsrv v0.9 · klogsrv-ps5.elf",
+      "summary": "klog · ps5-payload-dev/klogsrv",
+      "tags": [
+        "debug",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "klogsrv-ps5.elf",
+      "url": "/catalog/files/klogsrv-ps5.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/klogsrv/releases/download/v0.9/klogsrv-ps5.elf",
+      "sha256": "e828ec144231f81547cb58bc7d2c396fa984be0c2295f31364b58017816dcceb",
+      "source": "https://github.com/ps5-payload-dev/klogsrv",
+      "version": "v0.9",
+      "bytes": 136016,
+      "enabled": true
+    },
+    {
+      "id": "pacbrew-repo-v0_38-gdbsrv-4f29495d_elf",
+      "name": "pacbrew-repo v0.38 · gdbsrv.elf",
+      "summary": "GDB · ps5-payload-dev/pacbrew-repo",
+      "tags": [
+        "debug",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "gdbsrv-4f29495d.elf",
+      "url": "/catalog/files/gdbsrv-4f29495d.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/pacbrew-repo/releases/download/v0.38/ps5-payload-daemons.zip",
+      "sha256": "4f29495d39666501f0d47c5b792ea42bb9dabea27e9044fce97619651e1ffdaa",
+      "source": "https://github.com/ps5-payload-dev/pacbrew-repo",
+      "version": "v0.38",
+      "bytes": 174160,
+      "enabled": true
+    },
+    {
+      "id": "pacbrew-repo-v0_38-klogsrv-08c17f0b_elf",
+      "name": "pacbrew-repo v0.38 · klogsrv.elf",
+      "summary": "klog · ps5-payload-dev/pacbrew-repo",
+      "tags": [
+        "debug",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "klogsrv-08c17f0b.elf",
+      "url": "/catalog/files/klogsrv-08c17f0b.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/pacbrew-repo/releases/download/v0.38/ps5-payload-daemons.zip",
+      "sha256": "08c17f0b8e80828cd2c86426edbffca7719faa603af516610f1c3e0dcc254536",
+      "source": "https://github.com/ps5-payload-dev/pacbrew-repo",
+      "version": "v0.38",
+      "bytes": 135928,
+      "enabled": true
+    },
+    {
+      "id": "pacbrew-repo-v0_39-gdbsrv-d94d744d_elf",
+      "name": "pacbrew-repo v0.39 · gdbsrv.elf",
+      "summary": "GDB · ps5-payload-dev/pacbrew-repo",
+      "tags": [
+        "debug",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "gdbsrv-d94d744d.elf",
+      "url": "/catalog/files/gdbsrv-d94d744d.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/pacbrew-repo/releases/download/v0.39/ps5-payload-daemons.zip",
+      "sha256": "d94d744d504dc2a6fb1fbd01dec752e360bba3c35c95b263d4133d366c642805",
+      "source": "https://github.com/ps5-payload-dev/pacbrew-repo",
+      "version": "v0.39",
+      "bytes": 174248,
+      "enabled": true
+    },
+    {
+      "id": "pacbrew-repo-v0_39-klogsrv-94b709e0_elf",
+      "name": "pacbrew-repo v0.39 · klogsrv.elf",
+      "summary": "klog · ps5-payload-dev/pacbrew-repo",
+      "tags": [
+        "debug",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "klogsrv-94b709e0.elf",
+      "url": "/catalog/files/klogsrv-94b709e0.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/pacbrew-repo/releases/download/v0.39/ps5-payload-daemons.zip",
+      "sha256": "94b709e08ae9be296ab3ca9509dd8f6bdd3b24cde593061db9792e0eb71c6884",
+      "source": "https://github.com/ps5-payload-dev/pacbrew-repo",
+      "version": "v0.39",
+      "bytes": 136016,
+      "enabled": true
+    },
+    {
+      "id": "pacbrew-repo-v0_40_1-gdbsrv-f7b476f7_elf",
+      "name": "pacbrew-repo v0.40.1 · gdbsrv.elf",
+      "summary": "GDB · ps5-payload-dev/pacbrew-repo",
+      "tags": [
+        "debug",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "gdbsrv-f7b476f7.elf",
+      "url": "/catalog/files/gdbsrv-f7b476f7.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/pacbrew-repo/releases/download/v0.40.1/ps5-payload-daemons.zip",
+      "sha256": "f7b476f7739edfb74ab75a4fec8ede12446c935d383cf76eadfd9da9f05ccc6b",
+      "source": "https://github.com/ps5-payload-dev/pacbrew-repo",
+      "version": "v0.40.1",
+      "bytes": 174248,
+      "enabled": true
+    },
+    {
+      "id": "pacbrew-repo-v0_40_2-gdbsrv-141c7f57_elf",
+      "name": "pacbrew-repo v0.40.2 · gdbsrv.elf",
+      "summary": "GDB · ps5-payload-dev/pacbrew-repo",
+      "tags": [
+        "debug",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "gdbsrv-141c7f57.elf",
+      "url": "/catalog/files/gdbsrv-141c7f57.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/pacbrew-repo/releases/download/v0.40.2/ps5-payload-daemons.zip",
+      "sha256": "141c7f57f29afdfb12a0749e025080ed8fc86056fc5524ba4e43d3349c43d956",
+      "source": "https://github.com/ps5-payload-dev/pacbrew-repo",
+      "version": "v0.40.2",
+      "bytes": 174248,
+      "enabled": true
+    },
+    {
+      "id": "pacbrew-repo-v0_40_3-gdbsrv_elf",
+      "name": "pacbrew-repo v0.40.3 · gdbsrv.elf",
+      "summary": "GDB · ps5-payload-dev/pacbrew-repo",
+      "tags": [
+        "debug",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "gdbsrv.elf",
+      "url": "/catalog/files/gdbsrv.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/pacbrew-repo/releases/download/v0.40.3/ps5-payload-daemons.zip",
+      "sha256": "45b35ff3e67d51ab81cf1682b429e7375f58d517b607e689f4bc875e3ed7e5a9",
+      "source": "https://github.com/ps5-payload-dev/pacbrew-repo",
+      "version": "v0.40.3",
+      "bytes": 174808,
+      "enabled": true
+    },
+    {
+      "id": "pacbrew-repo-v0_40_3-klogsrv_elf",
+      "name": "pacbrew-repo v0.40.3 · klogsrv.elf",
+      "summary": "klog · ps5-payload-dev/pacbrew-repo",
+      "tags": [
+        "debug",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "klogsrv.elf",
+      "url": "/catalog/files/klogsrv.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/pacbrew-repo/releases/download/v0.40.3/ps5-payload-daemons.zip",
+      "sha256": "6216120237be97bb5b7aee564bca4a67877d304dee26d8e7a6d40a10b7ade125",
+      "source": "https://github.com/ps5-payload-dev/pacbrew-repo",
+      "version": "v0.40.3",
+      "bytes": 136576,
+      "enabled": true
+    },
+    {
+      "id": "ftpsrv-v0_19-ftpsrv-ps5-install-252afcc0_elf",
+      "name": "ftpsrv v0.19 · ftpsrv-ps5-install.elf",
+      "summary": "FTP · ps5-payload-dev/ftpsrv",
+      "tags": [
+        "ftp",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "ftpsrv-ps5-install-252afcc0.elf",
+      "url": "/catalog/files/ftpsrv-ps5-install-252afcc0.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/ftpsrv/releases/download/v0.19/ftpsrv-ps5-install.elf",
+      "sha256": "252afcc01ef5fca4dc314d46232d3ac2ce5332fcc3a450a1c02bdc046652ead6",
+      "source": "https://github.com/ps5-payload-dev/ftpsrv",
+      "version": "v0.19",
+      "bytes": 700120,
+      "enabled": true
+    },
+    {
+      "id": "ftpsrv-v0_19-ftpsrv-ps5-e6c1babb_elf",
+      "name": "ftpsrv v0.19 · ftpsrv-ps5.elf",
+      "summary": "FTP · ps5-payload-dev/ftpsrv",
+      "tags": [
+        "ftp",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "ftpsrv-ps5-e6c1babb.elf",
+      "url": "/catalog/files/ftpsrv-ps5-e6c1babb.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/ftpsrv/releases/download/v0.19/ftpsrv-ps5.elf",
+      "sha256": "e6c1babbfd5e1b766d12b659853b514b9faedf6333cbe8cb514b1a3e79b7ce39",
+      "source": "https://github.com/ps5-payload-dev/ftpsrv",
+      "version": "v0.19",
+      "bytes": 174712,
+      "enabled": true
+    },
+    {
+      "id": "ftpsrv-v0_20-ftpsrv-ps5-install-23f69de0_elf",
+      "name": "ftpsrv v0.20 · ftpsrv-ps5-install.elf",
+      "summary": "FTP · ps5-payload-dev/ftpsrv",
+      "tags": [
+        "ftp",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "ftpsrv-ps5-install-23f69de0.elf",
+      "url": "/catalog/files/ftpsrv-ps5-install-23f69de0.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/ftpsrv/releases/download/v0.20/ftpsrv-ps5-install.elf",
+      "sha256": "23f69de0f1ab1e1a3869473e87a271f750ec595056df0142fabbf21f5153c077",
+      "source": "https://github.com/ps5-payload-dev/ftpsrv",
+      "version": "v0.20",
+      "bytes": 700120,
+      "enabled": true
+    },
+    {
+      "id": "ftpsrv-v0_20-ftpsrv-ps5-8f305a95_elf",
+      "name": "ftpsrv v0.20 · ftpsrv-ps5.elf",
+      "summary": "FTP · ps5-payload-dev/ftpsrv",
+      "tags": [
+        "ftp",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "ftpsrv-ps5-8f305a95.elf",
+      "url": "/catalog/files/ftpsrv-ps5-8f305a95.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/ftpsrv/releases/download/v0.20/ftpsrv-ps5.elf",
+      "sha256": "8f305a959fb9d70fd8d52ba88409e0d5a1632e83d4ecdd38646a0a33e54089da",
+      "source": "https://github.com/ps5-payload-dev/ftpsrv",
+      "version": "v0.20",
+      "bytes": 174712,
+      "enabled": true
+    },
+    {
+      "id": "ftpsrv-v0_21_1-ftpsrv-ps4_elf",
+      "name": "ftpsrv v0.21.1 · ftpsrv-ps4.elf",
+      "summary": "FTP · ps5-payload-dev/ftpsrv",
+      "tags": [
+        "ftp",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "ftpsrv-ps4.elf",
+      "url": "/catalog/files/ftpsrv-ps4.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/ftpsrv/releases/download/v0.21.1/ftpsrv-ps4.elf",
+      "sha256": "5f00e2df7fa8ab7daa084343f38394e6672cd389e03fc8598a54d7d9e1d58d16",
+      "source": "https://github.com/ps5-payload-dev/ftpsrv",
+      "version": "v0.21.1",
+      "bytes": 146720,
+      "enabled": true
+    },
+    {
+      "id": "ftpsrv-v0_21_1-ftpsrv-ps5-install_elf",
+      "name": "ftpsrv v0.21.1 · ftpsrv-ps5-install.elf",
+      "summary": "FTP · ps5-payload-dev/ftpsrv",
+      "tags": [
+        "ftp",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "ftpsrv-ps5-install.elf",
+      "url": "/catalog/files/ftpsrv-ps5-install.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/ftpsrv/releases/download/v0.21.1/ftpsrv-ps5-install.elf",
+      "sha256": "0ccfe0097081be0514aabef34390a0f6776226e8b3eefbb047964584e0cfe3a9",
+      "source": "https://github.com/ps5-payload-dev/ftpsrv",
+      "version": "v0.21.1",
+      "bytes": 717272,
+      "enabled": true
+    },
+    {
+      "id": "ftpsrv-v0_21_1-ftpsrv-ps5_elf",
+      "name": "ftpsrv v0.21.1 · ftpsrv-ps5.elf",
+      "summary": "FTP · ps5-payload-dev/ftpsrv",
+      "tags": [
+        "ftp",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "ftpsrv-ps5.elf",
+      "url": "/catalog/files/ftpsrv-ps5.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/ftpsrv/releases/download/v0.21.1/ftpsrv-ps5.elf",
+      "sha256": "7d4b31c83eae4e056580482a3a074e1db25922efc74ac1e439473b45d71a5938",
+      "source": "https://github.com/ps5-payload-dev/ftpsrv",
+      "version": "v0.21.1",
+      "bytes": 191864,
+      "enabled": true
+    },
+    {
+      "id": "pacbrew-repo-v0_38-ftpsrv-d236f0f3_elf",
+      "name": "pacbrew-repo v0.38 · ftpsrv.elf",
+      "summary": "FTP · ps5-payload-dev/pacbrew-repo",
+      "tags": [
+        "ftp",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "ftpsrv-d236f0f3.elf",
+      "url": "/catalog/files/ftpsrv-d236f0f3.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/pacbrew-repo/releases/download/v0.38/ps5-payload-daemons.zip",
+      "sha256": "d236f0f3609c2fdd3902b77c38140f0504fb0e7b1455d5af0fa5f7c93e1fadaa",
+      "source": "https://github.com/ps5-payload-dev/pacbrew-repo",
+      "version": "v0.38",
+      "bytes": 191784,
+      "enabled": true
+    },
+    {
+      "id": "pacbrew-repo-v0_39-ftpsrv-05559e40_elf",
+      "name": "pacbrew-repo v0.39 · ftpsrv.elf",
+      "summary": "FTP · ps5-payload-dev/pacbrew-repo",
+      "tags": [
+        "ftp",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "ftpsrv-05559e40.elf",
+      "url": "/catalog/files/ftpsrv-05559e40.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/pacbrew-repo/releases/download/v0.39/ps5-payload-daemons.zip",
+      "sha256": "05559e40fddf519ec603f125603c9b2d282bbb41515b0442256c9ff7972b9e85",
+      "source": "https://github.com/ps5-payload-dev/pacbrew-repo",
+      "version": "v0.39",
+      "bytes": 191864,
+      "enabled": true
+    },
+    {
+      "id": "pacbrew-repo-v0_40_1-ftpsrv-ebcf3055_elf",
+      "name": "pacbrew-repo v0.40.1 · ftpsrv.elf",
+      "summary": "FTP · ps5-payload-dev/pacbrew-repo",
+      "tags": [
+        "ftp",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "ftpsrv-ebcf3055.elf",
+      "url": "/catalog/files/ftpsrv-ebcf3055.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/pacbrew-repo/releases/download/v0.40.1/ps5-payload-daemons.zip",
+      "sha256": "ebcf3055b00eff61ad63c5de8bd8716fd1b1262c1fc809f4b2922ee040d24711",
+      "source": "https://github.com/ps5-payload-dev/pacbrew-repo",
+      "version": "v0.40.1",
+      "bytes": 191864,
+      "enabled": true
+    },
+    {
+      "id": "pacbrew-repo-v0_40_2-ftpsrv-c638cbad_elf",
+      "name": "pacbrew-repo v0.40.2 · ftpsrv.elf",
+      "summary": "FTP · ps5-payload-dev/pacbrew-repo",
+      "tags": [
+        "ftp",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "ftpsrv-c638cbad.elf",
+      "url": "/catalog/files/ftpsrv-c638cbad.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/pacbrew-repo/releases/download/v0.40.2/ps5-payload-daemons.zip",
+      "sha256": "c638cbad2170af8200333f8f431f59d6e3e1e4826a8fd11b2f8c7ba3408bfd3e",
+      "source": "https://github.com/ps5-payload-dev/pacbrew-repo",
+      "version": "v0.40.2",
+      "bytes": 191864,
+      "enabled": true
+    },
+    {
+      "id": "pacbrew-repo-v0_40_3-ftpsrv_elf",
+      "name": "pacbrew-repo v0.40.3 · ftpsrv.elf",
+      "summary": "FTP · ps5-payload-dev/pacbrew-repo",
+      "tags": [
+        "ftp",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "ftpsrv.elf",
+      "url": "/catalog/files/ftpsrv.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/pacbrew-repo/releases/download/v0.40.3/ps5-payload-daemons.zip",
+      "sha256": "562f28b5e4aab35c9cad130a3a98e7c70da3c888f1ec217c23d6fd335b6bb808",
+      "source": "https://github.com/ps5-payload-dev/pacbrew-repo",
+      "version": "v0.40.3",
+      "bytes": 192432,
+      "enabled": true
+    },
+    {
+      "id": "etahen-2_3b-etahen-2_3b_bin",
+      "name": "etaHEN 2.3B · etaHEN-2.3B.bin",
+      "summary": "HEN · etaHEN/etaHEN",
+      "tags": [
+        "hen",
+        "etaHEN",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "etaHEN-2.3B.bin",
+      "url": "/catalog/files/etaHEN-2.3B.bin",
+      "remote_url": "https://github.com/etaHEN/etaHEN/releases/download/2.3B/etaHEN-2.3B.bin",
+      "sha256": "15159a1e4063068920b7efcee8d4ff814845014d2c574f27528841f608c75404",
+      "source": "https://github.com/etaHEN/etaHEN",
+      "version": "2.3B",
+      "bytes": 2394080,
+      "enabled": true
+    },
+    {
+      "id": "etahen-2_4b-etahen-2_4b_bin",
+      "name": "etaHEN 2.4B · etaHEN-2.4B.bin",
+      "summary": "HEN · etaHEN/etaHEN",
+      "tags": [
+        "hen",
+        "etaHEN",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "etaHEN-2.4B.bin",
+      "url": "/catalog/files/etaHEN-2.4B.bin",
+      "remote_url": "https://github.com/etaHEN/etaHEN/releases/download/2.4B/etaHEN-2.4B.bin",
+      "sha256": "a6850d461e2a8e6e622d1d128b18da01837883f1d3d451522620f9e3032ecb48",
+      "source": "https://github.com/etaHEN/etaHEN",
+      "version": "2.4B",
+      "bytes": 4606040,
+      "enabled": true
+    },
+    {
+      "id": "etahen-2_5b-etahen-2_5b_bin",
+      "name": "etaHEN 2.5B · etaHEN-2.5B.bin",
+      "summary": "HEN · etaHEN/etaHEN",
+      "tags": [
+        "hen",
+        "etaHEN",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "etaHEN-2.5B.bin",
+      "url": "/catalog/files/etaHEN-2.5B.bin",
+      "remote_url": "https://github.com/etaHEN/etaHEN/releases/download/2.5B/etaHEN-2.5B.bin",
+      "sha256": "4845cac45095361b8983b14d6690622183b0dcfbf6d7fda16e161aa91ff0531e",
+      "source": "https://github.com/etaHEN/etaHEN",
+      "version": "2.5B",
+      "bytes": 4678728,
+      "enabled": true
+    },
+    {
+      "id": "elfldr-v0_23-elfldr-ps5-092d16ee_elf",
+      "name": "elfldr v0.23 · elfldr-ps5.elf",
+      "summary": "ELF loader / autoload · ps5-payload-dev/elfldr",
+      "tags": [
+        "loader",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "elfldr-ps5-092d16ee.elf",
+      "url": "/catalog/files/elfldr-ps5-092d16ee.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/elfldr/releases/download/v0.23/elfldr-ps5.elf",
+      "sha256": "092d16ee0ede0c494947efd38d1a17bbd7cc4b022d3858ea898833c188c703e8",
+      "source": "https://github.com/ps5-payload-dev/elfldr",
+      "version": "v0.23",
+      "bytes": 397000,
+      "enabled": true
+    },
+    {
+      "id": "elfldr-v0_24-elfldr-ps5-e2331336_elf",
+      "name": "elfldr v0.24 · elfldr-ps5.elf",
+      "summary": "ELF loader / autoload · ps5-payload-dev/elfldr",
+      "tags": [
+        "loader",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "elfldr-ps5-e2331336.elf",
+      "url": "/catalog/files/elfldr-ps5-e2331336.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/elfldr/releases/download/v0.24/elfldr-ps5.elf",
+      "sha256": "e23313367cf59a9b0a09e34eb59e435e2c387de418e557d65bf578b7744942a5",
+      "source": "https://github.com/ps5-payload-dev/elfldr",
+      "version": "v0.24",
+      "bytes": 397024,
+      "enabled": true
+    },
+    {
+      "id": "elfldr-v0_25-elfldr-ps5-de70a47e_elf",
+      "name": "elfldr v0.25 · elfldr-ps5.elf",
+      "summary": "ELF loader / autoload · ps5-payload-dev/elfldr",
+      "tags": [
+        "loader",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "elfldr-ps5-de70a47e.elf",
+      "url": "/catalog/files/elfldr-ps5-de70a47e.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/elfldr/releases/download/v0.25/elfldr-ps5.elf",
+      "sha256": "de70a47e6d099dc03718c33c158a727f1340c3b5310155618c5049ab0fb41754",
+      "source": "https://github.com/ps5-payload-dev/elfldr",
+      "version": "v0.25",
+      "bytes": 397024,
+      "enabled": true
+    },
+    {
+      "id": "elfldr-v0_26-elfldr-ps5_elf",
+      "name": "elfldr v0.26 · elfldr-ps5.elf",
+      "summary": "ELF loader / autoload · ps5-payload-dev/elfldr",
+      "tags": [
+        "loader",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "elfldr-ps5.elf",
+      "url": "/catalog/files/elfldr-ps5.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/elfldr/releases/download/v0.26/elfldr-ps5.elf",
+      "sha256": "ed6d587a057c09d6a95b2176e336d9ffc605e547ac56462128b029e47b8ccea1",
+      "source": "https://github.com/ps5-payload-dev/elfldr",
+      "version": "v0.26",
+      "bytes": 394480,
+      "enabled": true
+    },
+    {
+      "id": "pacbrew-repo-v0_38-elfldr-108c5ed4_elf",
+      "name": "pacbrew-repo v0.38 · elfldr.elf",
+      "summary": "ELF loader / autoload · ps5-payload-dev/pacbrew-repo",
+      "tags": [
+        "loader",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "elfldr-108c5ed4.elf",
+      "url": "/catalog/files/elfldr-108c5ed4.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/pacbrew-repo/releases/download/v0.38/ps5-payload-daemons.zip",
+      "sha256": "108c5ed486296733ea26035b2e85bbf537b9c59d6c1c3a16f57a3ebb89af1b63",
+      "source": "https://github.com/ps5-payload-dev/pacbrew-repo",
+      "version": "v0.38",
+      "bytes": 397000,
+      "enabled": true
+    },
+    {
+      "id": "pacbrew-repo-v0_39-elfldr-f04633dd_elf",
+      "name": "pacbrew-repo v0.39 · elfldr.elf",
+      "summary": "ELF loader / autoload · ps5-payload-dev/pacbrew-repo",
+      "tags": [
+        "loader",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "elfldr-f04633dd.elf",
+      "url": "/catalog/files/elfldr-f04633dd.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/pacbrew-repo/releases/download/v0.39/ps5-payload-daemons.zip",
+      "sha256": "f04633dd6d4eac2eababdc2e345da679a1669ff918afd87e5b78346178679c6b",
+      "source": "https://github.com/ps5-payload-dev/pacbrew-repo",
+      "version": "v0.39",
+      "bytes": 397024,
+      "enabled": true
+    },
+    {
+      "id": "pacbrew-repo-v0_40_1-elfldr-1ed89305_elf",
+      "name": "pacbrew-repo v0.40.1 · elfldr.elf",
+      "summary": "ELF loader / autoload · ps5-payload-dev/pacbrew-repo",
+      "tags": [
+        "loader",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "elfldr-1ed89305.elf",
+      "url": "/catalog/files/elfldr-1ed89305.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/pacbrew-repo/releases/download/v0.40.1/ps5-payload-daemons.zip",
+      "sha256": "1ed89305976d010bce673da4ea87b6fda34683ffbde74a15b6e30191c6f17cee",
+      "source": "https://github.com/ps5-payload-dev/pacbrew-repo",
+      "version": "v0.40.1",
+      "bytes": 397024,
+      "enabled": true
+    },
+    {
+      "id": "pacbrew-repo-v0_40_2-elfldr-16e7021e_elf",
+      "name": "pacbrew-repo v0.40.2 · elfldr.elf",
+      "summary": "ELF loader / autoload · ps5-payload-dev/pacbrew-repo",
+      "tags": [
+        "loader",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "elfldr-16e7021e.elf",
+      "url": "/catalog/files/elfldr-16e7021e.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/pacbrew-repo/releases/download/v0.40.2/ps5-payload-daemons.zip",
+      "sha256": "16e7021eb92b3c64ef5e4c3c4e846b4d87688d731542fc4def1f5d1e5a0338f3",
+      "source": "https://github.com/ps5-payload-dev/pacbrew-repo",
+      "version": "v0.40.2",
+      "bytes": 397024,
+      "enabled": true
+    },
+    {
+      "id": "pacbrew-repo-v0_40_3-elfldr_elf",
+      "name": "pacbrew-repo v0.40.3 · elfldr.elf",
+      "summary": "ELF loader / autoload · ps5-payload-dev/pacbrew-repo",
+      "tags": [
+        "loader",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "elfldr.elf",
+      "url": "/catalog/files/elfldr.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/pacbrew-repo/releases/download/v0.40.3/ps5-payload-daemons.zip",
+      "sha256": "10ac558683dda4b475792f158e5592b9ab50c98818e62f9f19a5cab4854e685f",
+      "source": "https://github.com/ps5-payload-dev/pacbrew-repo",
+      "version": "v0.40.3",
+      "bytes": 394480,
+      "enabled": true
+    },
+    {
+      "id": "ps5-elfldr-v0_24-148b71c-elfldr-ps5-v0_24-148b71c_elf",
+      "name": "ps5-elfldr v0.24-148b71c · elfldr-ps5-v0.24-148b71c.elf",
+      "summary": "ELF loader / autoload · itsPLK/ps5-elfldr",
+      "tags": [
+        "loader",
+        "itsPLK",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "elfldr-ps5-v0.24-148b71c.elf",
+      "url": "/catalog/files/elfldr-ps5-v0.24-148b71c.elf",
+      "remote_url": "https://github.com/itsPLK/ps5-elfldr/releases/download/v0.24-148b71c/elfldr-ps5-v0.24-148b71c.elf",
+      "sha256": "6bf3a5416c84305f4e62cc952861f810806eb6613a3d24c4b35f947f2650ba33",
+      "source": "https://github.com/itsPLK/ps5-elfldr",
+      "version": "v0.24-148b71c",
+      "bytes": 397024,
+      "enabled": true
+    },
+    {
+      "id": "ps5-elfldr-v0_26-bb1e117-elfldr-ps5-v0_26-bb1e117_elf",
+      "name": "ps5-elfldr v0.26-bb1e117 · elfldr-ps5-v0.26-bb1e117.elf",
+      "summary": "ELF loader / autoload · itsPLK/ps5-elfldr",
+      "tags": [
+        "loader",
+        "itsPLK",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "elfldr-ps5-v0.26-bb1e117.elf",
+      "url": "/catalog/files/elfldr-ps5-v0.26-bb1e117.elf",
+      "remote_url": "https://github.com/itsPLK/ps5-elfldr/releases/download/v0.26-bb1e117/elfldr-ps5-v0.26-bb1e117.elf",
+      "sha256": "fa3f0c2b778318000982ada05c01bde70ac875c85e4be6fcc9b5ba836f6d1c3c",
+      "source": "https://github.com/itsPLK/ps5-elfldr",
+      "version": "v0.26-bb1e117",
+      "bytes": 394480,
+      "enabled": true
+    },
+    {
+      "id": "ps5-unified-autoloader-v0_1_3-78a6f02-ps5-unified-autoloader-v0_1_3-78a6f02_elf",
+      "name": "ps5-unified-autoloader v0.1.3-78a6f02 · ps5-unified-autoloader-v0.1.3-78a6f02.elf",
+      "summary": "ELF loader / autoload · itsPLK/ps5-unified-autoloader",
+      "tags": [
+        "loader",
+        "itsPLK",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "ps5-unified-autoloader-v0.1.3-78a6f02.elf",
+      "url": "/catalog/files/ps5-unified-autoloader-v0.1.3-78a6f02.elf",
+      "remote_url": "https://github.com/itsPLK/ps5-unified-autoloader/releases/download/v0.1.3-78a6f02/ps5-unified-autoloader-v0.1.3-78a6f02.elf",
+      "sha256": "f411cc69872d7bdfc1d5166b37e93cd31bffdce355ff204c74f787767a4acad8",
+      "source": "https://github.com/itsPLK/ps5-unified-autoloader",
+      "version": "v0.1.3-78a6f02",
+      "bytes": 2510344,
+      "enabled": true
+    },
+    {
+      "id": "ps5-unified-autoloader-v0_1_5-915a65e-ps5-unified-autoloader-v0_1_5-915a65e_elf",
+      "name": "ps5-unified-autoloader v0.1.5-915a65e · ps5-unified-autoloader-v0.1.5-915a65e.elf",
+      "summary": "ELF loader / autoload · itsPLK/ps5-unified-autoloader",
+      "tags": [
+        "loader",
+        "itsPLK",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "ps5-unified-autoloader-v0.1.5-915a65e.elf",
+      "url": "/catalog/files/ps5-unified-autoloader-v0.1.5-915a65e.elf",
+      "remote_url": "https://github.com/itsPLK/ps5-unified-autoloader/releases/download/v0.1.5-915a65e/ps5-unified-autoloader-v0.1.5-915a65e.elf",
+      "sha256": "c8e36ea06cfd37c5fad356ff9fcd09d3e62065d88170b5119ce8f1eeb3efacac",
+      "source": "https://github.com/itsPLK/ps5-unified-autoloader",
+      "version": "v0.1.5-915a65e",
+      "bytes": 2526736,
+      "enabled": true
+    },
+    {
+      "id": "ps5-payload-manager-v0_3_3-pldmgr_v0_3_3_elf",
+      "name": "ps5-payload-manager v0.3.3 · pldmgr_v0.3.3.elf",
+      "summary": "Manager / launcher · itsPLK/ps5-payload-manager",
+      "tags": [
+        "manager",
+        "itsPLK",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "pldmgr_v0.3.3.elf",
+      "url": "/catalog/files/pldmgr_v0.3.3.elf",
+      "remote_url": "https://github.com/itsPLK/ps5-payload-manager/releases/download/v0.3.3/pldmgr_v0.3.3.elf",
+      "sha256": "8a214dcc190c893b1dea43ab64cb89c431a34630906c31413f6f44c0389b698e",
+      "source": "https://github.com/itsPLK/ps5-payload-manager",
+      "version": "v0.3.3",
+      "bytes": 2050320,
+      "enabled": true
+    },
+    {
+      "id": "ps5-payload-manager-v0_4_0-pldmgr_v0_4_0_elf",
+      "name": "ps5-payload-manager v0.4.0 · pldmgr_v0.4.0.elf",
+      "summary": "Manager / launcher · itsPLK/ps5-payload-manager",
+      "tags": [
+        "manager",
+        "itsPLK",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "pldmgr_v0.4.0.elf",
+      "url": "/catalog/files/pldmgr_v0.4.0.elf",
+      "remote_url": "https://github.com/itsPLK/ps5-payload-manager/releases/download/v0.4.0/pldmgr_v0.4.0.elf",
+      "sha256": "460808dead44100c4cb6e4ad8a768ffd1c5445afc7d1cb83e2727030240a85fd",
+      "source": "https://github.com/itsPLK/ps5-payload-manager",
+      "version": "v0.4.0",
+      "bytes": 2132240,
+      "enabled": true
+    },
+    {
+      "id": "ps5-payload-manager-v0_5_0-pldmgr_v0_5_0_elf",
+      "name": "ps5-payload-manager v0.5.0 · pldmgr_v0.5.0.elf",
+      "summary": "Manager / launcher · itsPLK/ps5-payload-manager",
+      "tags": [
+        "manager",
+        "itsPLK",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "pldmgr_v0.5.0.elf",
+      "url": "/catalog/files/pldmgr_v0.5.0.elf",
+      "remote_url": "https://github.com/itsPLK/ps5-payload-manager/releases/download/v0.5.0/pldmgr_v0.5.0.elf",
+      "sha256": "1fe181908027fc625147ac888288ed1bee72a378b4751d36a8a8e0582d306169",
+      "source": "https://github.com/itsPLK/ps5-payload-manager",
+      "version": "v0.5.0",
+      "bytes": 2394384,
+      "enabled": true
+    },
+    {
+      "id": "ps5-payload-manager-v0_5_1-pldmgr_v0_5_1_elf",
+      "name": "ps5-payload-manager v0.5.1 · pldmgr_v0.5.1.elf",
+      "summary": "Manager / launcher · itsPLK/ps5-payload-manager",
+      "tags": [
+        "manager",
+        "itsPLK",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "pldmgr_v0.5.1.elf",
+      "url": "/catalog/files/pldmgr_v0.5.1.elf",
+      "remote_url": "https://github.com/itsPLK/ps5-payload-manager/releases/download/v0.5.1/pldmgr_v0.5.1.elf",
+      "sha256": "05617c69ea145d1c11b8f7a6b7d3bd9e6df3831afd25d71a4ac85d63fb8e28aa",
+      "source": "https://github.com/itsPLK/ps5-payload-manager",
+      "version": "v0.5.1",
+      "bytes": 2410768,
+      "enabled": true
+    },
+    {
+      "id": "ps5-payload-manager-v0_5_2-pldmgr_v0_5_2_elf",
+      "name": "ps5-payload-manager v0.5.2 · pldmgr_v0.5.2.elf",
+      "summary": "Manager / launcher · itsPLK/ps5-payload-manager",
+      "tags": [
+        "manager",
+        "itsPLK",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "pldmgr_v0.5.2.elf",
+      "url": "/catalog/files/pldmgr_v0.5.2.elf",
+      "remote_url": "https://github.com/itsPLK/ps5-payload-manager/releases/download/v0.5.2/pldmgr_v0.5.2.elf",
+      "sha256": "62b3ba2a4937c2afc502f9a4e7242cca538610ebb4ae2800c7c6f72e7f268e7c",
+      "source": "https://github.com/itsPLK/ps5-payload-manager",
+      "version": "v0.5.2",
+      "bytes": 2410776,
+      "enabled": true
+    },
+    {
+      "id": "plutotv-v0_2-plutotv-install-278fca81_elf",
+      "name": "plutotv v0.2 · plutotv-install.elf",
+      "summary": "Média · ps5-payload-dev/plutotv",
+      "tags": [
+        "media",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "plutotv-install-278fca81.elf",
+      "url": "/catalog/files/plutotv-install-278fca81.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/plutotv/releases/download/v0.2/plutotv-install.elf",
+      "sha256": "278fca8187a509d2b4cd27796e84596ae850d7e10fc34522bf8796bc9ba756f4",
+      "source": "https://github.com/ps5-payload-dev/plutotv",
+      "version": "v0.2",
+      "bytes": 985512,
+      "enabled": true
+    },
+    {
+      "id": "plutotv-v0_3-plutotv-install_elf",
+      "name": "plutotv v0.3 · plutotv-install.elf",
+      "summary": "Média · ps5-payload-dev/plutotv",
+      "tags": [
+        "media",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "plutotv-install.elf",
+      "url": "/catalog/files/plutotv-install.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/plutotv/releases/download/v0.3/plutotv-install.elf",
+      "sha256": "a8f80f35bf35b6194e3d8540309518b752cff8f9586a918749772bdd8668a6f8",
+      "source": "https://github.com/ps5-payload-dev/plutotv",
+      "version": "v0.3",
+      "bytes": 985512,
+      "enabled": true
+    },
+    {
+      "id": "svtplay-v0_2-svtplay-install-5bdf2514_elf",
+      "name": "svtplay v0.2 · svtplay-install.elf",
+      "summary": "Média · ps5-payload-dev/svtplay",
+      "tags": [
+        "media",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "svtplay-install-5bdf2514.elf",
+      "url": "/catalog/files/svtplay-install-5bdf2514.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/svtplay/releases/download/v0.2/svtplay-install.elf",
+      "sha256": "5bdf25142512f25dc6269bd7c90a914001fcef5e731125a74aa23c1a8d91810f",
+      "source": "https://github.com/ps5-payload-dev/svtplay",
+      "version": "v0.2",
+      "bytes": 148520,
+      "enabled": true
+    },
+    {
+      "id": "svtplay-v0_3-svtplay-install_elf",
+      "name": "svtplay v0.3 · svtplay-install.elf",
+      "summary": "Média · ps5-payload-dev/svtplay",
+      "tags": [
+        "media",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "svtplay-install.elf",
+      "url": "/catalog/files/svtplay-install.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/svtplay/releases/download/v0.3/svtplay-install.elf",
+      "sha256": "31f2caac7d53b8754bb37cb0364e615bfc38fc5f02c886d286a4f9e603b56832",
+      "source": "https://github.com/ps5-payload-dev/svtplay",
+      "version": "v0.3",
+      "bytes": 149168,
+      "enabled": true
+    },
+    {
+      "id": "tv4play-v0_2-tv4play-install-8e93a551_elf",
+      "name": "tv4play v0.2 · tv4play-install.elf",
+      "summary": "Média · ps5-payload-dev/tv4play",
+      "tags": [
+        "media",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "tv4play-install-8e93a551.elf",
+      "url": "/catalog/files/tv4play-install-8e93a551.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/tv4play/releases/download/v0.2/tv4play-install.elf",
+      "sha256": "8e93a5519bfcb880f39d6803032af40f6176dae538eea12e476fcb6137fc43ea",
+      "source": "https://github.com/ps5-payload-dev/tv4play",
+      "version": "v0.2",
+      "bytes": 625056,
+      "enabled": true
+    },
+    {
+      "id": "tv4play-v0_3-tv4play-install_elf",
+      "name": "tv4play v0.3 · tv4play-install.elf",
+      "summary": "Média · ps5-payload-dev/tv4play",
+      "tags": [
+        "media",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "tv4play-install.elf",
+      "url": "/catalog/files/tv4play-install.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/tv4play/releases/download/v0.3/tv4play-install.elf",
+      "sha256": "63faa8240dd51bea0756e718d484f275d8c160fdc775ad8754f359b861393c23",
+      "source": "https://github.com/ps5-payload-dev/tv4play",
+      "version": "v0.3",
+      "bytes": 641440,
+      "enabled": true
+    },
+    {
+      "id": "fetchpkg-v0_2-fetchpkg-676d2886_elf",
+      "name": "fetchpkg v0.2 · fetchpkg.elf",
+      "summary": "PKG / daemons · ps5-payload-dev/fetchpkg",
+      "tags": [
+        "pkg",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "fetchpkg-676d2886.elf",
+      "url": "/catalog/files/fetchpkg-676d2886.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/fetchpkg/releases/download/v0.2/PS5.zip",
+      "sha256": "676d2886991b57558f92ddfb618b1436f98cd2c8c6e855aede577efdd745fbec",
+      "source": "https://github.com/ps5-payload-dev/fetchpkg",
+      "version": "v0.2",
+      "bytes": 2052456,
+      "enabled": true
+    },
+    {
+      "id": "fetchpkg-v0_3-fetchpkg_elf",
+      "name": "fetchpkg v0.3 · fetchpkg.elf",
+      "summary": "PKG / daemons · ps5-payload-dev/fetchpkg",
+      "tags": [
+        "pkg",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "fetchpkg.elf",
+      "url": "/catalog/files/fetchpkg.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/fetchpkg/releases/download/v0.3/PS5.zip",
+      "sha256": "ce8b10acb1985d7a09acb84490599777d40a89028764e4d7d06a52742e05535c",
+      "source": "https://github.com/ps5-payload-dev/fetchpkg",
+      "version": "v0.3",
+      "bytes": 2403352,
+      "enabled": true
+    },
+    {
+      "id": "launchpad-v0_2-launchpad-install_elf",
+      "name": "launchpad v0.2 · launchpad-install.elf",
+      "summary": "PKG / daemons · ps5-payload-dev/launchpad",
+      "tags": [
+        "pkg",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "launchpad-install.elf",
+      "url": "/catalog/files/launchpad-install.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/launchpad/releases/download/v0.2/launchpad-install.elf",
+      "sha256": "5f53da68491229b52e18f84017975be3753487fee6e0f22c55d8e7a11fafed02",
+      "source": "https://github.com/ps5-payload-dev/launchpad",
+      "version": "v0.2",
+      "bytes": 247384,
+      "enabled": true
+    },
+    {
+      "id": "pacbrew-repo-v0_38-shsrv-07b85396_elf",
+      "name": "pacbrew-repo v0.38 · shsrv.elf",
+      "summary": "Shell · ps5-payload-dev/pacbrew-repo",
+      "tags": [
+        "shell",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "shsrv-07b85396.elf",
+      "url": "/catalog/files/shsrv-07b85396.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/pacbrew-repo/releases/download/v0.38/ps5-payload-daemons.zip",
+      "sha256": "07b85396c5eec3c0fd35726689790531ec7f6ac28cce4f8c7d47be78a14b3fbc",
+      "source": "https://github.com/ps5-payload-dev/pacbrew-repo",
+      "version": "v0.38",
+      "bytes": 985576,
+      "enabled": true
+    },
+    {
+      "id": "pacbrew-repo-v0_39-shsrv-44b39c39_elf",
+      "name": "pacbrew-repo v0.39 · shsrv.elf",
+      "summary": "Shell · ps5-payload-dev/pacbrew-repo",
+      "tags": [
+        "shell",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "shsrv-44b39c39.elf",
+      "url": "/catalog/files/shsrv-44b39c39.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/pacbrew-repo/releases/download/v0.39/ps5-payload-daemons.zip",
+      "sha256": "44b39c396505241de8a4a2be63e5b29355b6bf5fed09ac0076053c0dfc6a74d4",
+      "source": "https://github.com/ps5-payload-dev/pacbrew-repo",
+      "version": "v0.39",
+      "bytes": 986184,
+      "enabled": true
+    },
+    {
+      "id": "pacbrew-repo-v0_40_1-shsrv-fc45b041_elf",
+      "name": "pacbrew-repo v0.40.1 · shsrv.elf",
+      "summary": "Shell · ps5-payload-dev/pacbrew-repo",
+      "tags": [
+        "shell",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "shsrv-fc45b041.elf",
+      "url": "/catalog/files/shsrv-fc45b041.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/pacbrew-repo/releases/download/v0.40.1/ps5-payload-daemons.zip",
+      "sha256": "fc45b041296b6c2b603c0c7f3daeb4468a87368a8d3e11b16b57e71f6d12bac5",
+      "source": "https://github.com/ps5-payload-dev/pacbrew-repo",
+      "version": "v0.40.1",
+      "bytes": 986184,
+      "enabled": true
+    },
+    {
+      "id": "pacbrew-repo-v0_40_2-shsrv-be1d7e17_elf",
+      "name": "pacbrew-repo v0.40.2 · shsrv.elf",
+      "summary": "Shell · ps5-payload-dev/pacbrew-repo",
+      "tags": [
+        "shell",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "shsrv-be1d7e17.elf",
+      "url": "/catalog/files/shsrv-be1d7e17.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/pacbrew-repo/releases/download/v0.40.2/ps5-payload-daemons.zip",
+      "sha256": "be1d7e17bfe1e8811a288ecc850b4d6798eef80d3b19913edbedb9c3b30388a0",
+      "source": "https://github.com/ps5-payload-dev/pacbrew-repo",
+      "version": "v0.40.2",
+      "bytes": 986184,
+      "enabled": true
+    },
+    {
+      "id": "pacbrew-repo-v0_40_3-shsrv_elf",
+      "name": "pacbrew-repo v0.40.3 · shsrv.elf",
+      "summary": "Shell · ps5-payload-dev/pacbrew-repo",
+      "tags": [
+        "shell",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "shsrv.elf",
+      "url": "/catalog/files/shsrv.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/pacbrew-repo/releases/download/v0.40.3/ps5-payload-daemons.zip",
+      "sha256": "37fceccc1dfc0d53a9a13dae635dbe1d9995791be2c2db01a617084fee6d6d58",
+      "source": "https://github.com/ps5-payload-dev/pacbrew-repo",
+      "version": "v0.40.3",
+      "bytes": 990144,
+      "enabled": true
+    },
+    {
+      "id": "shsrv-v0_18-shsrv-ps5-5d53f6a4_elf",
+      "name": "shsrv v0.18 · shsrv-ps5.elf",
+      "summary": "Shell · ps5-payload-dev/shsrv",
+      "tags": [
+        "shell",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "shsrv-ps5-5d53f6a4.elf",
+      "url": "/catalog/files/shsrv-ps5-5d53f6a4.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/shsrv/releases/download/v0.18/shsrv-ps5.elf",
+      "sha256": "5d53f6a4262b98aa29659ed1a5a56094633394141abd1902ac06b915e901b4bd",
+      "source": "https://github.com/ps5-payload-dev/shsrv",
+      "version": "v0.18",
+      "bytes": 912952,
+      "enabled": true
+    },
+    {
+      "id": "shsrv-v0_19-shsrv-ps5-797827b5_elf",
+      "name": "shsrv v0.19 · shsrv-ps5.elf",
+      "summary": "Shell · ps5-payload-dev/shsrv",
+      "tags": [
+        "shell",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "shsrv-ps5-797827b5.elf",
+      "url": "/catalog/files/shsrv-ps5-797827b5.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/shsrv/releases/download/v0.19/shsrv-ps5.elf",
+      "sha256": "797827b50a93dbf327abdca45063d76ea24b17e561d927f397a0b73cadb2e2bd",
+      "source": "https://github.com/ps5-payload-dev/shsrv",
+      "version": "v0.19",
+      "bytes": 981872,
+      "enabled": true
+    },
+    {
+      "id": "shsrv-v0_20-shsrv-ps5_elf",
+      "name": "shsrv v0.20 · shsrv-ps5.elf",
+      "summary": "Shell · ps5-payload-dev/shsrv",
+      "tags": [
+        "shell",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "shsrv-ps5.elf",
+      "url": "/catalog/files/shsrv-ps5.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/shsrv/releases/download/v0.20/shsrv-ps5.elf",
+      "sha256": "fa4ccb2587bb61be317df0d001f668b17ebf9b4aafad87acf691b1fb8da0bd2d",
+      "source": "https://github.com/ps5-payload-dev/shsrv",
+      "version": "v0.20",
+      "bytes": 986184,
+      "enabled": true
+    },
+    {
+      "id": "pacbrew-repo-v0_38-websrv-c76fa2df_elf",
+      "name": "pacbrew-repo v0.38 · websrv.elf",
+      "summary": "Web server · ps5-payload-dev/pacbrew-repo",
+      "tags": [
+        "web",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "websrv-c76fa2df.elf",
+      "url": "/catalog/files/websrv-c76fa2df.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/pacbrew-repo/releases/download/v0.38/ps5-payload-daemons.zip",
+      "sha256": "c76fa2dfd8f65accf6655904163d7e82d83ec546a6a483439a2eefe9cdfc4a4c",
+      "source": "https://github.com/ps5-payload-dev/pacbrew-repo",
+      "version": "v0.38",
+      "bytes": 1597848,
+      "enabled": true
+    },
+    {
+      "id": "pacbrew-repo-v0_39-websrv-2d03aab3_elf",
+      "name": "pacbrew-repo v0.39 · websrv.elf",
+      "summary": "Web server · ps5-payload-dev/pacbrew-repo",
+      "tags": [
+        "web",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "websrv-2d03aab3.elf",
+      "url": "/catalog/files/websrv-2d03aab3.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/pacbrew-repo/releases/download/v0.39/ps5-payload-daemons.zip",
+      "sha256": "2d03aab385ed98b847efa88fd0466964946fdd726f62527605f9d1f0bb32182a",
+      "source": "https://github.com/ps5-payload-dev/pacbrew-repo",
+      "version": "v0.39",
+      "bytes": 1597928,
+      "enabled": true
+    },
+    {
+      "id": "pacbrew-repo-v0_40_1-websrv-1902db0a_elf",
+      "name": "pacbrew-repo v0.40.1 · websrv.elf",
+      "summary": "Web server · ps5-payload-dev/pacbrew-repo",
+      "tags": [
+        "web",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "websrv-1902db0a.elf",
+      "url": "/catalog/files/websrv-1902db0a.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/pacbrew-repo/releases/download/v0.40.1/ps5-payload-daemons.zip",
+      "sha256": "1902db0abc8028feb7441938de9c93f8eb06818cf1ea037ed4c86e3a90de043d",
+      "source": "https://github.com/ps5-payload-dev/pacbrew-repo",
+      "version": "v0.40.1",
+      "bytes": 1598784,
+      "enabled": true
+    },
+    {
+      "id": "pacbrew-repo-v0_40_2-websrv-b493d276_elf",
+      "name": "pacbrew-repo v0.40.2 · websrv.elf",
+      "summary": "Web server · ps5-payload-dev/pacbrew-repo",
+      "tags": [
+        "web",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "websrv-b493d276.elf",
+      "url": "/catalog/files/websrv-b493d276.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/pacbrew-repo/releases/download/v0.40.2/ps5-payload-daemons.zip",
+      "sha256": "b493d276f984e4d6d596941fb4ced245d08d4d428b5054d15678221cb99ca671",
+      "source": "https://github.com/ps5-payload-dev/pacbrew-repo",
+      "version": "v0.40.2",
+      "bytes": 1598784,
+      "enabled": true
+    },
+    {
+      "id": "pacbrew-repo-v0_40_3-websrv_elf",
+      "name": "pacbrew-repo v0.40.3 · websrv.elf",
+      "summary": "Web server · ps5-payload-dev/pacbrew-repo",
+      "tags": [
+        "web",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "websrv.elf",
+      "url": "/catalog/files/websrv.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/pacbrew-repo/releases/download/v0.40.3/ps5-payload-daemons.zip",
+      "sha256": "2dd297c8041719761147f30f06966600f300043343751dcc49f5faeca17c84b0",
+      "source": "https://github.com/ps5-payload-dev/pacbrew-repo",
+      "version": "v0.40.3",
+      "bytes": 1599344,
+      "enabled": true
+    },
+    {
+      "id": "websrv-v0_30-websrv-ps5-65f72e6e_elf",
+      "name": "websrv v0.30 · websrv-ps5.elf",
+      "summary": "Web server · ps5-payload-dev/websrv",
+      "tags": [
+        "web",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "websrv-ps5-65f72e6e.elf",
+      "url": "/catalog/files/websrv-ps5-65f72e6e.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/websrv/releases/download/v0.30/websrv-ps5.elf",
+      "sha256": "65f72e6ebcd0c6311247362aba32c38acb2adbe09039e71c4f573e6db630b430",
+      "source": "https://github.com/ps5-payload-dev/websrv",
+      "version": "v0.30",
+      "bytes": 1446784,
+      "enabled": true
+    },
+    {
+      "id": "websrv-v0_31-websrv-ps5-bfe1664a_elf",
+      "name": "websrv v0.31 · websrv-ps5.elf",
+      "summary": "Web server · ps5-payload-dev/websrv",
+      "tags": [
+        "web",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "websrv-ps5-bfe1664a.elf",
+      "url": "/catalog/files/websrv-ps5-bfe1664a.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/websrv/releases/download/v0.31/websrv-ps5.elf",
+      "sha256": "bfe1664adf119a953a7a9c0aef2f817adadd014823eabfa3ad3d0de2ab0aa8c2",
+      "source": "https://github.com/ps5-payload-dev/websrv",
+      "version": "v0.31",
+      "bytes": 1596936,
+      "enabled": true
+    },
+    {
+      "id": "websrv-v0_32-websrv-ps5-8dd24df1_elf",
+      "name": "websrv v0.32 · websrv-ps5.elf",
+      "summary": "Web server · ps5-payload-dev/websrv",
+      "tags": [
+        "web",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "websrv-ps5-8dd24df1.elf",
+      "url": "/catalog/files/websrv-ps5-8dd24df1.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/websrv/releases/download/v0.32/websrv-ps5.elf",
+      "sha256": "8dd24df100bff6db156e86bdf9380d5c0fcd2a680c2b08f5c87380d5007190c5",
+      "source": "https://github.com/ps5-payload-dev/websrv",
+      "version": "v0.32",
+      "bytes": 1597088,
+      "enabled": true
+    },
+    {
+      "id": "websrv-v0_33-devilutionx-2e2f1867_elf",
+      "name": "websrv v0.33 · devilutionx.elf",
+      "summary": "Web server · ps5-payload-dev/websrv",
+      "tags": [
+        "web",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "devilutionx-2e2f1867.elf",
+      "url": "/catalog/files/devilutionx-2e2f1867.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/websrv/releases/download/v0.33/DevilutionX.zip",
+      "sha256": "2e2f1867321897656df1285e502ae487ba4e7c0fafd077af2ccaf6dd442c2b09",
+      "source": "https://github.com/ps5-payload-dev/websrv",
+      "version": "v0.33",
+      "bytes": 7170072,
+      "enabled": true
+    },
+    {
+      "id": "websrv-v0_33-websrv-ps5-4676a40a_elf",
+      "name": "websrv v0.33 · websrv-ps5.elf",
+      "summary": "Web server · ps5-payload-dev/websrv",
+      "tags": [
+        "web",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "websrv-ps5-4676a40a.elf",
+      "url": "/catalog/files/websrv-ps5-4676a40a.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/websrv/releases/download/v0.33/websrv-ps5.elf",
+      "sha256": "4676a40ac4c7ca1adeb04980efa48dd33a8961446b42e6a12abfcbe96090c8ac",
+      "source": "https://github.com/ps5-payload-dev/websrv",
+      "version": "v0.33",
+      "bytes": 1597248,
+      "enabled": true
+    },
+    {
+      "id": "websrv-v0_34-crispy-doom_elf",
+      "name": "websrv v0.34 · crispy-doom.elf",
+      "summary": "Web server · ps5-payload-dev/websrv",
+      "tags": [
+        "web",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "crispy-doom.elf",
+      "url": "/catalog/files/crispy-doom.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/websrv/releases/download/v0.34/CrispyDoom.zip",
+      "sha256": "536dbd809c5b2a97a4ad8b6a378f46b49eefd332a005601488ecf0b76feee1da",
+      "source": "https://github.com/ps5-payload-dev/websrv",
+      "version": "v0.34",
+      "bytes": 9646280,
+      "enabled": true
+    },
+    {
+      "id": "websrv-v0_34-crispy-heretic_elf",
+      "name": "websrv v0.34 · crispy-heretic.elf",
+      "summary": "Web server · ps5-payload-dev/websrv",
+      "tags": [
+        "web",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "crispy-heretic.elf",
+      "url": "/catalog/files/crispy-heretic.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/websrv/releases/download/v0.34/CrispyDoom.zip",
+      "sha256": "2177f973af9cd3371591d4d7e95a3a494f874ea763324895a237315db5be6a18",
+      "source": "https://github.com/ps5-payload-dev/websrv",
+      "version": "v0.34",
+      "bytes": 9188504,
+      "enabled": true
+    },
+    {
+      "id": "websrv-v0_34-crispy-hexen_elf",
+      "name": "websrv v0.34 · crispy-hexen.elf",
+      "summary": "Web server · ps5-payload-dev/websrv",
+      "tags": [
+        "web",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "crispy-hexen.elf",
+      "url": "/catalog/files/crispy-hexen.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/websrv/releases/download/v0.34/CrispyDoom.zip",
+      "sha256": "117a77705bb5149588c34ce455006f0d9540f0a3d44de847fe1177939b9e7932",
+      "source": "https://github.com/ps5-payload-dev/websrv",
+      "version": "v0.34",
+      "bytes": 10446624,
+      "enabled": true
+    },
+    {
+      "id": "websrv-v0_34-crispy-strife-setup_elf",
+      "name": "websrv v0.34 · crispy-strife-setup.elf",
+      "summary": "Web server · ps5-payload-dev/websrv",
+      "tags": [
+        "web",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "crispy-strife-setup.elf",
+      "url": "/catalog/files/crispy-strife-setup.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/websrv/releases/download/v0.34/CrispyDoom.zip",
+      "sha256": "31db67dbe8acb82bbd9745e7c3cf1fcc694f4e84c735c6046ffdc4ddeea0856c",
+      "source": "https://github.com/ps5-payload-dev/websrv",
+      "version": "v0.34",
+      "bytes": 3805448,
+      "enabled": true
+    },
+    {
+      "id": "websrv-v0_34-crispy-strife_elf",
+      "name": "websrv v0.34 · crispy-strife.elf",
+      "summary": "Web server · ps5-payload-dev/websrv",
+      "tags": [
+        "web",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "crispy-strife.elf",
+      "url": "/catalog/files/crispy-strife.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/websrv/releases/download/v0.34/CrispyDoom.zip",
+      "sha256": "377219927915d32b36afdfb092e8387691d67d2bdac69338f8712c347ef58b83",
+      "source": "https://github.com/ps5-payload-dev/websrv",
+      "version": "v0.34",
+      "bytes": 9332888,
+      "enabled": true
+    },
+    {
+      "id": "websrv-v0_34-devilutionx_elf",
+      "name": "websrv v0.34 · devilutionx.elf",
+      "summary": "Web server · ps5-payload-dev/websrv",
+      "tags": [
+        "web",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "devilutionx.elf",
+      "url": "/catalog/files/devilutionx.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/websrv/releases/download/v0.34/DevilutionX.zip",
+      "sha256": "dd1660796a022444a927f7564d7fc4adecfa7d602ae33200dfb8db08d2cf29df",
+      "source": "https://github.com/ps5-payload-dev/websrv",
+      "version": "v0.34",
+      "bytes": 7170096,
+      "enabled": true
+    },
+    {
+      "id": "websrv-v0_34-websrv-ps5_elf",
+      "name": "websrv v0.34 · websrv-ps5.elf",
+      "summary": "Web server · ps5-payload-dev/websrv",
+      "tags": [
+        "web",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "websrv-ps5.elf",
+      "url": "/catalog/files/websrv-ps5.elf",
+      "remote_url": "https://github.com/ps5-payload-dev/websrv/releases/download/v0.34/websrv-ps5.elf",
+      "sha256": "54730c867c6e1148536fdcb370e63a7762d989ea87b62488ad4caff64d43f263",
+      "source": "https://github.com/ps5-payload-dev/websrv",
+      "version": "v0.34",
+      "bytes": 1597864,
+      "enabled": true
+    },
+    {
+      "id": "linkdev-v0_3-linkdev_zip",
+      "name": "linkdev v0.3 · LinkDev.zip",
+      "summary": "Compte / devices · ps5-payload-dev/linkdev",
+      "tags": [
+        "account",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "LinkDev.zip",
+      "url": "/catalog/files/LinkDev.zip",
+      "remote_url": "https://github.com/ps5-payload-dev/linkdev/releases/download/v0.3/LinkDev.zip",
+      "sha256": "4bab706bb6bb7227a9d560b77370740de1e6041dace278ee08ec998fe5eaaebc",
+      "source": "https://github.com/ps5-payload-dev/linkdev",
+      "version": "v0.3",
+      "bytes": 3405738,
+      "enabled": false,
+      "note": "ZIP sans payload ELF"
+    },
+    {
+      "id": "tvhp-v0_3-tvhp_zip",
+      "name": "tvhp v0.3 · TVHP.zip",
+      "summary": "Média · ps5-payload-dev/tvhp",
+      "tags": [
+        "media",
+        "ps5-payload-dev",
+        "trusted"
+      ],
+      "firmware": "voir release",
+      "filename": "TVHP.zip",
+      "url": "/catalog/files/TVHP.zip",
+      "remote_url": "https://github.com/ps5-payload-dev/tvhp/releases/download/v0.3/TVHP.zip",
+      "sha256": "529db0a304ff97f21d5363dddf13912a030b3bfd3cc680a8aa024ccce8d0c9d0",
+      "source": "https://github.com/ps5-payload-dev/tvhp",
+      "version": "v0.3",
+      "bytes": 19810772,
+      "enabled": false,
+      "note": "ZIP sans payload ELF"
+    }
+  ]
+}

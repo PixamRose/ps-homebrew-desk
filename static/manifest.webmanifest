@@ -1,0 +1,32 @@
+{
+  "name": "PS Homebrew Desk",
+  "short_name": "Homebrew Desk",
+  "description": "Companion PS5 homebrew — Mac, Windows, iPhone (PWA) sur le réseau local.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0B1220",
+  "theme_color": "#0A84FF",
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "/app-icon.png",
+      "sizes": "256x256",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
