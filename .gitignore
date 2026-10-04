@@ -3,7 +3,8 @@ __pycache__/
 *.pyc
 .DS_Store
 .iconbuild/
-catalog/files/
+catalog/files/*
+!catalog/files/.gitkeep
 updates/*.zip
 updates/manifest.json
 cache/

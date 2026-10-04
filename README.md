@@ -6,126 +6,178 @@
 
 <p align="center"><strong>by Pixam</strong></p>
 
-Companion **Mac / Windows / iPhone (PWA)** pour installer facilement des `.elf` / tools sur une PS5 jailbreakée, via le FTP etaHEN/OnionHEN.
+Companion **Mac / Windows / iPhone (PWA)** pour installer des `.elf` / tools / fichiers sur une PS5 jailbreakée, via le FTP (etaHEN / OnionHEN).
 
-> **Distribution publique** : vois [`RELEASE.md`](RELEASE.md) — publie le **build Windows `.exe`**, pas forcément tout le code source.
+---
 
-> **Avant un usage LAN public / multi-appareils** : définis `DESK_TOKEN=...` — sans token, n’importe qui sur le Wi‑Fi de confiance peut piloter les APIs mutantes du hub.
+## Prérequis
 
-## Plateformes
+### Console PS5
 
-| Appareil | Comment lancer |
+| Besoin | Détail |
 |---|---|
-| **Mac** | `python3 desktop.py` ou `start.command` |
-| **Windows** | `start.bat` (Python 3 + [WebView2](https://developer.microsoft.com/microsoft-edge/webview2/)) |
-| **iPhone / autre PC** | Sur le hub : `start-lan.command` / `start-lan.bat`, puis Safari/Chrome → URL LAN |
+| Firmware jailbreakable | Console déjà en homebrew (HEN / exploit) |
+| FTP actif | Port **1337** (OnionHEN / etaHEN) |
+| IP locale connue | Ex. `192.168.1.x` (Réglages réseau PS5) |
+| Même réseau | Mac/PC et PS5 sur le **même Wi‑Fi / Ethernet** |
+| PSN | Reste **offline** sur console JB |
 
-L’UI est une web app servie en local. Le mode LAN expose la même UI sur le Wi‑Fi → iPhone peut l’ouvrir et l’ajouter à l’écran d’accueil (PWA).
+### Mac (mode source)
 
-## Lancer
+| Besoin | Détail |
+|---|---|
+| macOS | Version récente recommandée |
+| Python | **3.10+** (`python3 --version`) |
+| Dépendances | `pip install -r requirements.txt` → **pywebview**, rarfile |
+| Archives (optionnel) | **Keka** ou `brew install unar` pour RAR/7z |
+| Réseau | Accès LAN vers la PS5 |
+
+### Windows — utilisateurs (release `.exe`)
+
+| Besoin | Détail |
+|---|---|
+| Windows | **10** ou **11** (64-bit) |
+| Runtime | [WebView2 Runtime](https://developer.microsoft.com/microsoft-edge/webview2/) (souvent déjà là avec Edge) |
+| App | `PSHomebrewDesk.exe` (release) — **Python pas obligatoire** |
+| Réseau | Même LAN que la PS5 |
+
+### Windows — développeur / build
+
+| Besoin | Détail |
+|---|---|
+| Python | **3.10+** avec *Add to PATH* |
+| WebView2 | Runtime Edge |
+| Build | `scripts\build-windows.bat` → `dist\PSHomebrewDesk\` |
+| Archives (optionnel) | WinRAR / UnRAR ou **7-Zip** |
+
+### iPhone (PWA)
+
+| Besoin | Détail |
+|---|---|
+| Hub | Mac ou PC lancé en **mode LAN** |
+| Navigateur | **Safari** |
+| Réseau | Même Wi‑Fi que le hub |
+| Install | Partager → **Sur l’écran d’accueil** |
+
+### Sécurité LAN (fortement recommandé)
+
+```bash
+# Mac
+DESK_TOKEN=ton-secret DESK_LAN=1 DESK_HOST=0.0.0.0 python3 desktop.py
+
+# Windows (cmd)
+set DESK_TOKEN=ton-secret
+set DESK_LAN=1
+set DESK_HOST=0.0.0.0
+start-lan.bat
+```
+
+Sans `DESK_TOKEN`, tout appareil sur le Wi‑Fi de confiance peut piloter le hub.
+
+---
+
+## Lancer rapidement
+
+### Mac
 
 ```bash
 cd pshomebrew-desk
 python3 -m pip install --user -r requirements.txt
 python3 desktop.py
+# ou double-clic : start.command
 ```
 
-Mode navigateur :
+Mode navigateur : `python3 app.py` → http://127.0.0.1:8787
+
+### Windows
+
+1. Release : lance `PSHomebrewDesk.exe`
+2. Source : double-clic `start.bat`
+
+### Mode LAN (iPhone / autre PC)
 
 ```bash
-python3 app.py
-# http://127.0.0.1:8787
+./start-lan.command   # Mac
+start-lan.bat         # Windows
 ```
 
-### Mode LAN (mises à jour + iPhone + Windows distant)
+Puis onglet **Desk → Réseau & mises à jour** pour copier l’URL.
 
-```bash
-# Mac
-./start-lan.command
+---
 
-# Windows
-start-lan.bat
+## Structure du projet
 
-# ou
-DESK_LAN=1 DESK_HOST=0.0.0.0 python3 desktop.py
+```
+pshomebrew-desk/
+├── desktop.py          # Fenêtre native (Mac / Windows)
+├── app.py              # Serveur HTTP + API
+├── transfer.py         # FTP / archives / jobs
+├── games.py · elfs.py  # Jeux & outils .elf
+├── relapse.py          # Host Relapse (optionnel)
+├── desk_common.py      # Chemins, version, LAN, auteur
+├── update_channel.py   # Mises à jour LAN
+├── version.json        # Version + auteur (Pixam)
+├── requirements.txt
+├── start.command / start.bat
+├── start-lan.command / start-lan.bat
+├── static/             # UI (HTML / CSS / JS) + icônes PWA
+├── assets/             # Logo, .icns, .ico
+├── catalog/            # Store (default.json) — files/ ignoré
+├── payloads/           # Tes .elf (non versionnés) + README
+├── updates/            # Zips de update LAN (ignorés)
+├── packaging/          # Spec PyInstaller Windows
+├── scripts/            # build-windows, publish/apply update
+└── docs/
+    └── RELEASE.md      # Publier sans exposer le source
 ```
 
-Optionnel : `DESK_TOKEN=secret` → les clients LAN doivent envoyer le header `X-PSHD-Token` (stockable dans le navigateur via `localStorage.pshd-token`).
+| Dossier | Rôle |
+|---|---|
+| `static/` | Interface web / PWA |
+| `assets/` | Branding (logo Pixam) |
+| `catalog/` | Catalogue store |
+| `payloads/` | Binaires HEN / tools **à ajouter toi-même** |
+| `packaging/` | Build `.exe` Windows |
+| `scripts/` | Outils build & update |
+| `docs/` | Doc publication |
 
-Dans l’onglet **Desk → Réseau & mises à jour** :
-- copie l’URL LAN
-- **Publier une mise à jour LAN**
-- les autres appareils téléchargent `/updates/latest.zip`
+---
 
-CLI :
+## Fonctionnalités
 
-```bash
-python3 scripts/publish_update.py "notes de version"
-# sur un autre appareil qui a déjà une copie du projet :
-python3 scripts/apply_update.py http://IP_DU_HUB:8787/updates/latest.zip
-```
-
-## Ce que ça fait
-
-- Scan rapide des ports (1337 / 9021 / 9120 / 9048)
-- Explorateur : écriture sur **`/data`**, **`/user`**, **`/mnt`** ; système en lecture seule
-- Store local (`catalog/default.json`) + SHA-256
-- Transfert FTP parallèle, liens → console (RAR/ZIP/7z extraits sur le Mac/PC), Relapse host
-- Hub LAN + canal de mise à jour + PWA iPhone
+- Scan ports (1337 / 9021 / …)
+- Explorateur : écriture `/data`, `/user`, `/mnt` — système en lecture seule
+- Store local + SHA-256
+- Transfert FTP, liens → download → extract local → upload
+- Hub LAN + updates + PWA iPhone
+- Signature **by Pixam**
 
 ### Archives (onglet Lien)
 
-`.rar` / `.zip` / `.7z` : téléchargés puis **extraits sur cet appareil**, puis upload FTP du contenu (pas l’archive brute, pas d’extraction sur la PS5).
+`.rar` / `.zip` / `.7z` : extraits **sur le Mac/PC**, puis upload du contenu (pas sur la PS5).
 
-- Mac : **Keka** détecté automatiquement (`/Applications/Keka.app`) — sinon `brew install unar`
-- Windows : WinRAR / UnRAR ou 7-Zip
+### Payloads
 
-## Ce que ça ne fait PAS
+Les `.elf` **ne sont pas** dans le dépôt. Place-les dans `payloads/` — voir `payloads/README.txt`.
 
-- Pas d’écriture sur `/system` et racines sensibles
-- Pas de patch kernel
-- Pas d’autoload auto
+---
 
-## Prérequis console
+## Ce que ça ne fait pas
 
-FTP up (souvent `:1337`) après HEN.
+- Écriture sur `/system`
+- Patch kernel
+- Autoload automatique
 
-## Payloads (non inclus)
+---
 
-Les binaires `.elf` (etaHEN, OnionHEN, etc.) **ne sont pas** livrés dans le dépôt. Place-les toi-même dans `payloads/` — voir `payloads/README.txt`.
+## Distribution
 
-## iPhone (plus tard / déjà utilisable)
+Voir [`docs/RELEASE.md`](docs/RELEASE.md) : publier le **build Windows**, pas forcément tout le code source.
 
-1. Lance Desk en **mode LAN** sur un Mac ou PC
-2. iPhone (même Wi‑Fi) → Safari → URL affichée dans Desk
-3. Partager → **Sur l’écran d’accueil**
-4. Les APIs mutantes (FTP write, etc.) passent par le hub — l’iPhone pilote, le hub exécute
-
-Une app Store native n’est pas requise pour l’usage LAN ; la PWA est la base iPhone.
-
-## Windows
-
-### Utilisateurs (recommandé)
-
-1. Télécharge la release `PSHomebrewDesk.zip`
-2. Installe [WebView2 Runtime](https://developer.microsoft.com/microsoft-edge/webview2/) si besoin
-3. Lance `PSHomebrewDesk.exe`
-
-### Développeur / build
-
-1. Python 3 + « Add to PATH »
-2. `scripts\build-windows.bat` → sort `dist\PSHomebrewDesk\`
-3. Ou mode source : `start.bat` / `start-lan.bat`
-
-## Sécurité
-
-- Par défaut bind `127.0.0.1` (pas exposé au Wi‑Fi)
-- `DESK_LAN=1` = réseau **privé de confiance** seulement — **active `DESK_TOKEN`**
-- Relapse / exploits tiers : optionnels (`vendor/` non versionné ; clonés à la demande)
-- Reste offline PSN sur console JB
+---
 
 ## Licence / auteur
 
-- **Auteur :** Pixam
-- Choisis un `LICENSE` avant publication (MIT, ou “All rights reserved — Pixam” si tu ne veux pas ouvrir le source).
+- **Auteur :** Pixam  
+- **Licence :** All Rights Reserved — voir [`LICENSE`](LICENSE)  
 - Respecte les licences des outils / payloads tiers.

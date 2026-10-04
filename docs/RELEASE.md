@@ -35,4 +35,4 @@ Les utilisateurs lancent `PSHomebrewDesk.exe` — pas besoin de Python ni du sou
 
 ## Licence
 
-Ajoute un `LICENSE` (ex. MIT pour l’app, ou “All rights reserved — Pixam”) selon ce que tu veux autoriser.
+Voir `LICENSE` à la racine (All Rights Reserved — Pixam).
