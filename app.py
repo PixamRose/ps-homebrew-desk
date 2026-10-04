@@ -23,11 +23,11 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 from urllib.parse import parse_qs, urlparse
 
-import transfer as xfer
-import relapse as relapse_host
-import games as games_mod
-import elfs as elfs_mod
-from desk_common import (
+from desk import transfer as xfer
+from desk import relapse as relapse_host
+from desk import games as games_mod
+from desk import elfs as elfs_mod
+from desk.common import (
     UPDATES_DIR,
     configure_stdio,
     remote_name,
@@ -1385,7 +1385,7 @@ class DeskHandler(SimpleHTTPRequestHandler):
             body = {}
         notes = str(body.get("notes") or "").strip()
         try:
-            from update_channel import build_update_zip
+            from desk.update_channel import build_update_zip
 
             manifest = build_update_zip(notes=notes)
             return self._json({"ok": True, "manifest": manifest})

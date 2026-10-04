@@ -16,11 +16,11 @@ import tempfile
 import shutil
 
 try:
-    from desk_common import app_root as _app_root
+    from desk.common import app_root as _app_root
 
     ROOT = _app_root()
 except Exception:
-    ROOT = Path(__file__).resolve().parent
+    ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_DIR = ROOT / "vendor" / "Relapse-Exploit"
 DEFAULT_PORT = 8000
 REPO_ZIP = "https://github.com/ntfargo/Relapse-Exploit/archive/refs/heads/main.zip"
@@ -37,12 +37,12 @@ _last_error = ""
 def local_ip(prefer_host: str = "") -> str:
     """Best-effort LAN IP (Mac / Windows / Linux)."""
     try:
-        from desk_common import local_ip as _local_ip
+        from desk.common import local_ip as _local_ip
 
         return _local_ip(prefer_host)
     except Exception:
         pass
-    # Minimal fallback if desk_common unavailable
+    # Minimal fallback if desk.common unavailable
     if prefer_host:
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

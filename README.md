@@ -109,36 +109,41 @@ Puis onglet **Desk → Réseau & mises à jour** pour copier l’URL.
 
 ```
 pshomebrew-desk/
-├── desktop.py          # Fenêtre native (Mac / Windows)
-├── app.py              # Serveur HTTP + API
-├── transfer.py         # FTP / archives / jobs
-├── games.py · elfs.py  # Jeux & outils .elf
-├── relapse.py          # Host Relapse (optionnel)
-├── desk_common.py      # Chemins, version, LAN, auteur
-├── update_channel.py   # Mises à jour LAN
-├── version.json        # Version + auteur (Pixam)
+├── desktop.py              # Entrée fenêtre native (Mac / Windows)
+├── app.py                  # Entrée serveur HTTP + API
+├── version.json            # Version + auteur (Pixam)
 ├── requirements.txt
 ├── start.command / start.bat
 ├── start-lan.command / start-lan.bat
-├── static/             # UI (HTML / CSS / JS) + icônes PWA
-├── assets/             # Logo, .icns, .ico
-├── catalog/            # Store (default.json) — files/ ignoré
-├── payloads/           # Tes .elf (non versionnés) + README
-├── updates/            # Zips de update LAN (ignorés)
-├── packaging/          # Spec PyInstaller Windows
-├── scripts/            # build-windows, publish/apply update
+├── desk/                   # Code applicatif
+│   ├── common.py           # Chemins, version, LAN, notifs
+│   ├── transfer.py         # FTP / archives / jobs
+│   ├── games.py · elfs.py  # Jeux & outils .elf
+│   ├── relapse.py          # Host Relapse (optionnel)
+│   └── update_channel.py   # Mises à jour LAN
+├── static/                 # UI (HTML / CSS / JS) + PWA
+├── assets/                 # Branding (.ico / .icns / logo)
+│   └── source/             # Sources graphiques (non runtime)
+├── catalog/                # Store (default.json) — files/ ignoré
+├── payloads/               # Tes .elf (non versionnés) + README
+├── updates/                # Zips de update LAN (ignorés)
+├── packaging/              # Spec PyInstaller Windows
+├── scripts/                # build-windows, publish/apply update
+├── community/              # Outils communauté (Discord…)
 └── docs/
-    └── RELEASE.md      # Publier sans exposer le source
+    └── RELEASE.md          # Publier sans exposer le source
 ```
 
 | Dossier | Rôle |
 |---|---|
+| `desk/` | Logique métier (imports Python) |
 | `static/` | Interface web / PWA |
 | `assets/` | Branding (logo Pixam) |
 | `catalog/` | Catalogue store |
 | `payloads/` | Binaires HEN / tools **à ajouter toi-même** |
 | `packaging/` | Build `.exe` Windows |
 | `scripts/` | Outils build & update |
+| `community/` | Setup Discord / communauté Pixam |
 | `docs/` | Doc publication |
 
 ---

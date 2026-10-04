@@ -9,7 +9,7 @@ import zipfile
 from pathlib import Path
 from typing import Any, Dict, Iterable, Set
 
-from desk_common import ROOT, UPDATES_DIR, app_version, load_version, local_ip, desk_port
+from desk.common import ROOT, UPDATES_DIR, app_version, load_version, local_ip, desk_port
 
 SKIP_DIR_NAMES = {
     ".git",
@@ -20,15 +20,21 @@ SKIP_DIR_NAMES = {
     "node_modules",
     ".venv",
     "venv",
+    "community",
+    "packaging",
+    "cache",
 }
 SKIP_FILE_SUFFIXES = {".pyc", ".pyo", ".DS_Store"}
 INCLUDE_ALWAYS = {
     "app.py",
     "desktop.py",
-    "transfer.py",
-    "relapse.py",
-    "desk_common.py",
-    "update_channel.py",
+    "desk/__init__.py",
+    "desk/common.py",
+    "desk/transfer.py",
+    "desk/games.py",
+    "desk/elfs.py",
+    "desk/relapse.py",
+    "desk/update_channel.py",
     "version.json",
     "requirements.txt",
     "README.md",

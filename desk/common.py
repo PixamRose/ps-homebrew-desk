@@ -44,18 +44,23 @@ def is_frozen() -> bool:
     return bool(getattr(sys, "frozen", False))
 
 
+def project_root() -> Path:
+    """Repository / install root (parent of the `desk` package in source mode)."""
+    return Path(__file__).resolve().parents[1]
+
+
 def bundle_root() -> Path:
     """Read-only resources (PyInstaller _MEIPASS, or project dir in source mode)."""
     if is_frozen() and hasattr(sys, "_MEIPASS"):
         return Path(getattr(sys, "_MEIPASS"))
-    return Path(__file__).resolve().parent
+    return project_root()
 
 
 def app_root() -> Path:
     """Writable app directory — next to the .exe/.app when frozen."""
     if is_frozen():
         return Path(sys.executable).resolve().parent
-    return Path(__file__).resolve().parent
+    return project_root()
 
 
 # Back-compat alias (source mode == project root)
@@ -259,7 +264,7 @@ def desk_runtime_info(prefer_host: str = "") -> Dict[str, Any]:
     manifest = read_update_manifest()
     extract = {}
     try:
-        from transfer import list_extract_tools
+        from desk.transfer import list_extract_tools
 
         extract = list_extract_tools()
     except Exception:

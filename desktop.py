@@ -20,7 +20,7 @@ if not getattr(sys, "frozen", False):
     if str(ROOT) not in sys.path:
         sys.path.insert(0, str(ROOT))
 
-from desk_common import (  # noqa: E402
+from desk.common import (  # noqa: E402
     app_author,
     app_root,
     app_version,
