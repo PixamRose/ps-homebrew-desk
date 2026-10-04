@@ -1,7 +1,7 @@
 {
   "name": "PS Homebrew Desk",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "channel": "stable",
   "author": "Pixam",
-  "notes": "By Pixam — Mac / Windows / hub LAN / PWA iPhone."
+  "notes": "Windows: encodage console, pywebview icon, double-lancement, extracteurs 7-Zip/WinRAR, chemins FTP POSIX."
 }

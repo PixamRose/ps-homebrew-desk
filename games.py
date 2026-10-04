@@ -6,7 +6,7 @@ import json
 import re
 import struct
 import threading
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any, Dict, List, Optional, Set, Tuple
 from ftplib import FTP, error_perm
 from io import BytesIO
@@ -161,8 +161,9 @@ def _ftp_read_bytes(ftp: FTP, path: str, limit: int = 2_000_000) -> bytes:
 
 
 def _ftp_exists_file(ftp: FTP, path: str) -> bool:
-    parent = str(Path(path).parent.as_posix())
-    name = Path(path).name
+    posix = PurePosixPath(path.replace("\\", "/"))
+    parent = posix.parent.as_posix() or "/"
+    name = posix.name
     if not parent.startswith("/"):
         parent = "/" + parent
     try:
@@ -372,8 +373,9 @@ def scan_games(ftp: FTP, roots: Optional[List[str]] = None) -> List[Dict[str, An
 
 def game_info(ftp: FTP, path: str) -> Dict[str, Any]:
     path = path.replace("\\", "/").rstrip("/") or path
-    parent = str(Path(path).parent.as_posix())
-    name = Path(path).name
+    posix = PurePosixPath(path)
+    parent = posix.parent.as_posix() or "/"
+    name = posix.name
     # File image?
     listing = _safe_list(ftp, parent if parent.startswith("/") else "/" + parent)
     for e in listing:

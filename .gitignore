@@ -10,9 +10,13 @@ updates/manifest.json
 cache/
 .venv/
 venv/
+community/discord/.env
 payloads/*.elf
 payloads/*.bin
 payloads/*.pkg
 build/
 dist/
 *.spec.bak
+_launch_debug.log
+_launch_debug.log.err
+*.log

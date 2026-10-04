@@ -185,14 +185,22 @@ def upload_file(
         except OSError:
             pass
         with local_path.open("rb") as raw:
-            with mmap.mmap(raw.fileno(), 0, access=mmap.ACCESS_READ) as mm:
+            try:
+                mm = mmap.mmap(raw.fileno(), 0, access=mmap.ACCESS_READ)
+            except (OSError, ValueError):
+                # Some Windows files / FS don't support mmap — buffered fallback.
+                mm = None
+            try:
                 pos = 0
                 while pos < file_size:
                     if should_cancel and should_cancel():
                         raise TransferCancelled("Annulé par l’utilisateur")
                     end = min(file_size, pos + BLOCKSIZE)
-                    view = mm[pos:end]
-                    # sendall in sub-chunks if the OS rejects huge buffers
+                    if mm is not None:
+                        view = mm[pos:end]
+                    else:
+                        raw.seek(pos)
+                        view = raw.read(end - pos)
                     offset = 0
                     while offset < len(view):
                         n = data.send(view[offset : offset + min(4 * 1024 * 1024, len(view) - offset)])
@@ -203,6 +211,9 @@ def upload_file(
                         if on_bytes:
                             on_bytes(n)
                     pos = end
+            finally:
+                if mm is not None:
+                    mm.close()
         data.close()
         data = None
         ftp.voidresp()
@@ -598,6 +609,9 @@ def _which_tools() -> List[Tuple[str, str]]:
         r"C:\Program Files\WinRAR\UnRAR.exe",
         r"C:\Program Files (x86)\WinRAR\UnRAR.exe",
         r"C:\Program Files\7-Zip\7z.exe",
+        r"C:\Program Files (x86)\7-Zip\7z.exe",
+        str(Path(os.environ.get("ProgramFiles", r"C:\Program Files")) / "7-Zip" / "7z.exe"),
+        str(Path(os.environ.get("ProgramFiles(x86)", r"C:\Program Files (x86)")) / "7-Zip" / "7z.exe"),
     ):
         p = Path(win)
         if p.is_file():
@@ -634,8 +648,14 @@ def list_extract_tools() -> Dict[str, Any]:
     ]
     has_unar = any(x["name"] == "unar" for x in stable)
     has_unrar = any(x["name"] == "unrar" for x in stable)
+    has_7z = any(x["name"] in ("7z", "7zz") for x in stable)
     hint = ""
-    if not has_unar and not has_unrar:
+    if sys.platform == "win32":
+        if not has_unrar and not has_7z:
+            hint = "Windows: installe 7-Zip ou WinRAR pour extraire ZIP/RAR/7z"
+        elif not has_7z and not has_unar:
+            hint = "7-Zip recommandé pour ZIP/7z (Program Files\\7-Zip\\7z.exe)"
+    elif not has_unar and not has_unrar:
         hint = "Installe unar pour des gros RAR fiables : brew install unar"
     elif not has_unar:
         hint = "unar recommandé (plus stable que Keka CLI) : brew install unar"
@@ -1318,7 +1338,9 @@ def _run_url_job(
                 raise
             upload_bytes = sum(p.stat().st_size for p, _ in items)
             # Actual remote root may differ from archive stem (unwrap folder name)
-            remote_roots = sorted({str(Path(r).parent.as_posix()) for _, r in items})
+            remote_roots = sorted(
+                {str(Path(r.replace("\\", "/")).as_posix().rsplit("/", 1)[0] or "/") for _, r in items}
+            )
             remote_display = remote_roots[0] if len(remote_roots) == 1 else remote
             with job._lock:
                 job.phase = "upload"

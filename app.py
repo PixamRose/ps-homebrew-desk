@@ -10,6 +10,7 @@ import os
 import re
 import socket
 import struct
+import sys
 import tempfile
 import threading
 import time
@@ -28,6 +29,9 @@ import games as games_mod
 import elfs as elfs_mod
 from desk_common import (
     UPDATES_DIR,
+    configure_stdio,
+    remote_name,
+    remote_parent,
     app_author,
     app_root,
     app_version,
@@ -279,7 +283,7 @@ def assert_writable_path(path: str) -> str:
 
 def join_remote(parent: str, name: str) -> str:
     parent = normalize_remote_path(parent)
-    name = Path(name).name
+    name = remote_name(name)
     if not name or name in (".", ".."):
         raise ValueError("Nom invalide")
     return normalize_remote_path(f"{parent.rstrip('/')}/{name}")
@@ -287,7 +291,7 @@ def join_remote(parent: str, name: str) -> str:
 
 def ftp_mkdir(ftp: FTP, path: str) -> None:
     path = assert_writable_path(path)
-    parent = str(Path(path).parent.as_posix())
+    parent = remote_parent(path)
     if parent and parent != ".":
         ensure_remote_dir(ftp, parent if parent.startswith("/") else "/" + parent)
     try:
@@ -301,7 +305,7 @@ def ftp_rename(ftp: FTP, src: str, dst: str) -> None:
     dst = assert_writable_path(dst)
     if src == dst:
         return
-    parent = str(Path(dst).parent.as_posix())
+    parent = remote_parent(dst)
     if not parent.startswith("/"):
         parent = "/" + parent
     ensure_remote_dir(ftp, parent)
@@ -393,7 +397,7 @@ def ftp_copy_file(ftp: FTP, src: str, dst: str) -> None:
     buf = BytesIO()
     ftp.retrbinary(f"RETR {src}", buf.write)
     buf.seek(0)
-    parent = str(Path(dst).parent.as_posix())
+    parent = remote_parent(dst)
     if not parent.startswith("/"):
         parent = "/" + parent
     ensure_remote_dir(ftp, parent)
@@ -834,7 +838,7 @@ class DeskHandler(SimpleHTTPRequestHandler):
                     ftp.retrbinary(f"RETR {remote_path}", buf.write)
                 data = buf.getvalue()
                 source = remote_path
-                filename = filename or Path(remote_path).name
+                filename = filename or remote_name(remote_path)
             except Exception as exc:  # noqa: BLE001
                 return self._error(f"FTP RETR échoué: {exc}", status=502)
         elif local_path:
@@ -945,7 +949,7 @@ class DeskHandler(SimpleHTTPRequestHandler):
             with ftp_connect(host) as ftp:
                 items = ftp_list(ftp, remote)
             items.sort(key=lambda it: (0 if it["type"] == "dir" else 1, it["name"].lower()))
-            parent = str(Path(remote).parent.as_posix()) if remote != "/" else "/"
+            parent = remote_parent(remote) if remote != "/" else "/"
             if parent != "/" and not parent.startswith("/"):
                 parent = "/" + parent
             return self._json(
@@ -1025,7 +1029,7 @@ class DeskHandler(SimpleHTTPRequestHandler):
         new_name = (body.get("name") or "").strip()
         try:
             src_path = normalize_remote_path(src)
-            dst = join_remote(str(Path(src_path).parent.as_posix()), new_name)
+            dst = join_remote(remote_parent(src_path), new_name)
             with ftp_connect(host) as ftp:
                 ftp_rename(ftp, src_path, dst)
             return self._json({"ok": True, "src": src_path, "dst": dst})
@@ -1613,8 +1617,8 @@ class DeskHandler(SimpleHTTPRequestHandler):
             return self._json({"ok": True, "elf": info})
         try:
             path = normalize_remote_path(path)
-            parent = str(Path(path).parent.as_posix())
-            name = Path(path).name
+            parent = remote_parent(path)
+            name = remote_name(path)
             with ftp_connect(host) as ftp:
                 size = 0
                 for e in ftp_list(ftp, parent if parent.startswith("/") else "/" + parent):
@@ -1639,7 +1643,7 @@ class DeskHandler(SimpleHTTPRequestHandler):
             return self._error("Invalid JSON")
         host = (body.get("host") or DEFAULT_HOST).strip()
         path = (body.get("path") or "").strip()
-        filename = str(body.get("filename") or Path(path).name).strip()
+        filename = str(body.get("filename") or remote_name(path)).strip()
         confirm = str(body.get("confirm") or "").strip()
         if not path:
             return self._error("Missing path")
@@ -1737,7 +1741,7 @@ class DeskHandler(SimpleHTTPRequestHandler):
         try:
             old_path = normalize_remote_path(path) if path else ""
             if old_path:
-                parent = str(Path(old_path).parent.as_posix())
+                parent = remote_parent(old_path)
                 if not parent.startswith("/"):
                     parent = "/" + parent
             else:
@@ -1775,25 +1779,49 @@ class DeskHandler(SimpleHTTPRequestHandler):
             return self._error(str(exc), status=502)
 
 
+def _safe_print(msg: str) -> None:
+    """Windows consoles are often cp1252 — never crash the server on a glyph."""
+    try:
+        print(msg)
+    except UnicodeEncodeError:
+        enc = getattr(sys.stdout, "encoding", None) or "ascii"
+        print(msg.encode(enc, errors="replace").decode(enc, errors="replace"))
+
+
+class DeskHTTPServer(ThreadingHTTPServer):
+    """Reusable bind helps Windows relaunch after crash / double-click."""
+
+    allow_reuse_address = True
+    daemon_threads = True
+
+
 def main() -> None:
+    configure_stdio()
     host = desk_bind_host()
     port = desk_port()
     STATIC.mkdir(parents=True, exist_ok=True)
     UPDATES_DIR.mkdir(parents=True, exist_ok=True)
-    server = ThreadingHTTPServer((host, port), DeskHandler)
+    PAYLOADS_DIR.mkdir(parents=True, exist_ok=True)
+    try:
+        server = DeskHTTPServer((host, port), DeskHandler)
+    except OSError as exc:
+        raise SystemExit(
+            f"Impossible d'ouvrir le port {port} ({host}): {exc}\n"
+            "Ferme l'autre instance de PS Homebrew Desk, ou change DESK_PORT."
+        ) from exc
     info = desk_runtime_info()
-    print(f"PS Homebrew Desk v{info['version']} by {app_author()} ({info['platform']})")
-    print(f"Local  → http://127.0.0.1:{port}")
+    _safe_print(f"PS Homebrew Desk v{info['version']} by {app_author()} ({info['platform']})")
+    _safe_print(f"Local  -> http://127.0.0.1:{port}")
     if lan_enabled() or host in ("0.0.0.0", "::"):
-        print(f"LAN    → {info['lan_url']}")
-        print("iPhone → Safari → partager → Sur l’écran d’accueil")
+        _safe_print(f"LAN    -> {info['lan_url']}")
+        _safe_print("iPhone -> Safari -> partager -> Sur l'ecran d'accueil")
         if desk_token():
-            print("Token  → DESK_TOKEN actif (header X-PSHD-Token)")
-    print("Writable: /data, /user, /mnt — system paths are read-only.")
+            _safe_print("Token  -> DESK_TOKEN actif (header X-PSHD-Token)")
+    _safe_print("Writable: /data, /user, /mnt - system paths are read-only.")
     try:
         server.serve_forever()
     except KeyboardInterrupt:
-        print("\nStopped.")
+        _safe_print("\nStopped.")
 
 
 if __name__ == "__main__":

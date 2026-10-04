@@ -9,10 +9,35 @@ import platform
 import socket
 import subprocess
 import sys
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any, Dict, Optional
 
 AUTHOR = "Pixam"
+
+
+def configure_stdio() -> None:
+    """Avoid UnicodeEncodeError on Windows cp1252 consoles / pythonw."""
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            reconf = getattr(stream, "reconfigure", None)
+            if callable(reconf):
+                reconf(encoding="utf-8", errors="replace")
+        except Exception:
+            pass
+
+
+def remote_parent(path: str) -> str:
+    """Parent of a console/FTP path (always POSIX, safe on Windows)."""
+    cleaned = (path or "/").replace("\\", "/")
+    parent = PurePosixPath(cleaned).parent.as_posix()
+    if not parent or parent == ".":
+        return "/"
+    return parent if parent.startswith("/") else f"/{parent}"
+
+
+def remote_name(path: str) -> str:
+    """Basename of a console/FTP path (always POSIX)."""
+    return PurePosixPath((path or "").replace("\\", "/")).name
 
 
 def is_frozen() -> bool:
@@ -181,7 +206,7 @@ def desktop_notify(title: str, message: str) -> bool:
             subprocess.run(["osascript", "-e", script], check=False, timeout=3)
             return True
         if system == "windows":
-            # PowerShell toast (Windows 10+)
+            # PowerShell toast (Windows 10+) — hide console window
             ps = (
                 "[Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime] > $null; "
                 "$template = [Windows.UI.Notifications.ToastNotificationManager]::GetTemplateContent("
@@ -192,12 +217,23 @@ def desktop_notify(title: str, message: str) -> bool:
                 "$toast = [Windows.UI.Notifications.ToastNotification]::new($template); "
                 "[Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier('PS Homebrew Desk by Pixam').Show($toast);"
             )
+            creationflags = 0
+            if hasattr(subprocess, "CREATE_NO_WINDOW"):
+                creationflags = subprocess.CREATE_NO_WINDOW
             subprocess.run(
-                ["powershell", "-NoProfile", "-Command", ps],
+                [
+                    "powershell",
+                    "-NoProfile",
+                    "-ExecutionPolicy",
+                    "Bypass",
+                    "-Command",
+                    ps,
+                ],
                 check=False,
                 timeout=6,
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.DEVNULL,
+                creationflags=creationflags,
             )
             return True
     except Exception:
