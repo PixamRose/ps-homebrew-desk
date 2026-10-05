@@ -721,6 +721,9 @@ class DeskHandler(SimpleHTTPRequestHandler):
         if path == "/api/profiles":
             return self._json({"ok": True, **history_mod.get_profiles_bundle()})
 
+        if path == "/api/prefs":
+            return self._json({"ok": True, "prefs": history_mod.get_prefs()})
+
         if path == "/api/links":
             return self._json({"ok": True, "links": history_mod.get_community_links()})
 
@@ -827,6 +830,9 @@ class DeskHandler(SimpleHTTPRequestHandler):
 
         if path == "/api/profiles":
             return self._handle_profiles_save()
+
+        if path == "/api/prefs":
+            return self._handle_prefs_save()
 
         if path == "/api/links":
             return self._handle_links_save()
@@ -1339,6 +1345,22 @@ class DeskHandler(SimpleHTTPRequestHandler):
         active = str(body.get("active") or "")
         saved = history_mod.save_profiles(profiles, active=active)
         return self._json({"ok": True, **saved})
+
+    def _handle_prefs_save(self) -> None:
+        if not self._is_local_client():
+            return self._error("Réglages réservés au réseau de confiance", status=403)
+        try:
+            body = self._read_json()
+        except Exception:
+            return self._error("Invalid JSON")
+        if body.get("clear"):
+            return self._json({"ok": True, "prefs": history_mod.clear_prefs()})
+        prefs = body.get("prefs") if isinstance(body.get("prefs"), dict) else body
+        if not isinstance(prefs, dict):
+            return self._error("prefs invalides")
+        merge = body.get("merge", True) is not False
+        saved = history_mod.save_prefs(prefs, merge=merge)
+        return self._json({"ok": True, "prefs": saved})
 
     def _handle_links_save(self) -> None:
         if not self._is_local_client():

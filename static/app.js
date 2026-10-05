@@ -112,11 +112,14 @@ function syncThemeLabels() {
   if (meta) meta.content = THEME_META_COLORS[t] || "#12b8a8";
 }
 
-function setTheme(theme) {
+function setTheme(theme, { persist = true } = {}) {
   const next = normalizeTheme(theme);
   document.documentElement.dataset.theme = next;
   localStorage.setItem("pshd-theme", next);
   syncThemeLabels();
+  if (persist) {
+    persistPrefs({ theme: next }).catch(() => {});
+  }
 }
 
 function cycleTheme() {
@@ -137,10 +140,59 @@ function loadPrefs() {
   }
 }
 
+function mirrorPrefsLocal(prefs) {
+  const next = prefs && typeof prefs === "object" ? prefs : {};
+  localStorage.setItem("pshd-prefs", JSON.stringify(next));
+  if (next.host) localStorage.setItem("pshd-host", next.host);
+  if (next.uiMode) localStorage.setItem("pshd-ui-mode", next.uiMode);
+  if (next.theme) localStorage.setItem("pshd-theme", next.theme);
+  return next;
+}
+
 function savePrefs(partial) {
   const next = { ...loadPrefs(), ...partial };
-  localStorage.setItem("pshd-prefs", JSON.stringify(next));
+  return mirrorPrefsLocal(next);
+}
+
+/** Persiste sur disque (cache/desk-prefs.json) — localStorage pywebview est volatil. */
+async function persistPrefs(partial = {}, { merge = true, clear = false } = {}) {
+  if (clear) {
+    localStorage.removeItem("pshd-prefs");
+    try {
+      await api("/api/prefs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ clear: true }),
+      });
+    } catch {
+      /* ignore */
+    }
+    return {};
+  }
+  const next = merge ? savePrefs(partial) : mirrorPrefsLocal(partial || {});
+  try {
+    const data = await api("/api/prefs", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prefs: next, merge }),
+    });
+    if (data?.prefs && typeof data.prefs === "object") {
+      return mirrorPrefsLocal(data.prefs);
+    }
+  } catch {
+    /* offline / serveur pas prêt — cache local déjà écrit */
+  }
   return next;
+}
+
+async function fetchServerPrefs() {
+  try {
+    const data = await api("/api/prefs");
+    if (data?.prefs && typeof data.prefs === "object") return data.prefs;
+  } catch {
+    /* ignore */
+  }
+  return null;
 }
 
 function applyPrefsToForm(prefs = loadPrefs()) {
@@ -917,6 +969,7 @@ function paintCatalog() {
 async function connect() {
   state.host = host();
   localStorage.setItem("pshd-host", state.host);
+  if (state.host) persistPrefs({ host: state.host }).catch(() => {});
   setChip("idle", "Connexion…");
   $("#status-note").textContent = `Scan de ${state.host}…`;
   $("#connect-btn").disabled = true;
@@ -1483,9 +1536,14 @@ async function refreshEden() {
     }
     if ($("#eden-stat-roms")) $("#eden-stat-roms").textContent = String(status.roms_count || 0);
     if (note) {
-      note.textContent = status.installed
-        ? `Installé · ${status.app_root} · firmware ${status.firmware?.count || 0} NCA · ${status.roms_count || 0} ROM(s)`
-        : `Pas encore installé — Installer / MAJ dépose ${status.title_id || "PPSA99008"} dans /data/homebrew`;
+      const data = status.data_root || "/data/prosperoeden";
+      const fw = status.firmware?.count || 0;
+      const roms = status.roms_count || 0;
+      if (status.installed) {
+        note.textContent = `App OK · ${status.app_root} · données ${data} · ${fw} NCA · ${roms} ROM(s)`;
+      } else {
+        note.textContent = `App absente — Installer / MAJ → /data/homebrew · fichiers → ${data}`;
+      }
     }
     if ($("#eden-release-note") && release?.tag) {
       $("#eden-release-note").textContent = `Release GitHub ${release.tag} · ${formatBytes(release.bytes || 0)}`;
@@ -1540,7 +1598,7 @@ async function refreshEden() {
 
 function eden_mod_parent(path) {
   const p = String(path || "").replace(/\/[^/]+$/, "");
-  return p || "/data/homebrew/PPSA99008/assets/roms";
+  return p || "/data/prosperoeden/roms";
 }
 
 function openFinderAt(path) {
@@ -1552,18 +1610,18 @@ function openFinderAt(path) {
 
 async function edenPushFiles(kind, files) {
   if (!files?.length) return;
-  const dest = state.eden?.paths?.[kind];
-  if (!dest) {
-    await refreshEden();
+  if (!state.eden?.paths?.[kind]) {
+    await refreshEden().catch(() => {});
   }
   const root = (state.eden?.paths && state.eden.paths[kind]) || {
-    keys: "/data/homebrew/PPSA99008/assets/keys",
-    firmware: "/data/homebrew/PPSA99008/assets/firmware",
-    roms: "/data/homebrew/PPSA99008/assets/roms",
+    keys: "/data/prosperoeden/keys",
+    firmware: "/data/prosperoeden/firmware",
+    roms: "/data/prosperoeden/roms",
+    updates: "/data/prosperoeden/updates",
   }[kind];
   if (!root) return toast("Destination inconnue");
   try {
-    toast(`Envoi ${kind}…`);
+    toast(`Envoi ${kind} → ${root}`);
     await startBrowserTransfer([...files], root);
     toast(`${kind} envoyé`);
     refreshEden().catch(() => {});
@@ -1690,24 +1748,29 @@ $("#settings-xfer-dest")?.addEventListener("change", () => {
   const wrap = $("#settings-xfer-custom-wrap");
   if (wrap) wrap.hidden = $("#settings-xfer-dest").value !== "__custom__";
 });
-$("#settings-save-btn")?.addEventListener("click", () => {
-  const prefs = readSettingsForm();
-  savePrefs(prefs);
-  applyPrefsToApp(prefs, { connect: false });
-  if ($("#settings-status")) $("#settings-status").textContent = "Réglages enregistrés";
-  toast("Réglages enregistrés");
+$("#settings-save-btn")?.addEventListener("click", async () => {
+  const prefs = { ...readSettingsForm(), theme: currentTheme() };
+  try {
+    const saved = await persistPrefs(prefs, { merge: true });
+    applyPrefsToApp(saved, { connect: false });
+    if ($("#settings-status")) $("#settings-status").textContent = "Réglages enregistrés (conservés au redémarrage)";
+    toast("Réglages enregistrés");
+  } catch (err) {
+    if ($("#settings-status")) $("#settings-status").textContent = err.message || "Échec enregistrement";
+    toast(err.message || "Échec enregistrement");
+  }
 });
-$("#settings-apply-btn")?.addEventListener("click", () => {
-  const prefs = readSettingsForm();
-  savePrefs(prefs);
-  applyPrefsToApp(prefs, { connect: false });
-  if ($("#settings-status")) $("#settings-status").textContent = "Appliqué à l’interface";
+$("#settings-apply-btn")?.addEventListener("click", async () => {
+  const prefs = { ...readSettingsForm(), theme: currentTheme() };
+  const saved = await persistPrefs(prefs, { merge: true });
+  applyPrefsToApp(saved, { connect: false });
+  if ($("#settings-status")) $("#settings-status").textContent = "Appliqué et enregistré";
   toast("Réglages appliqués");
 });
-$("#settings-reset-btn")?.addEventListener("click", () => {
-  localStorage.removeItem("pshd-prefs");
+$("#settings-reset-btn")?.addEventListener("click", async () => {
+  await persistPrefs({}, { clear: true });
   applyPrefsToForm({
-    host: localStorage.getItem("pshd-host") || "",
+    host: "",
     uiMode: "beginner",
     xferDest: "/data/homebrew",
     workers: 3,
@@ -1733,7 +1796,7 @@ $("#games-open-folder-btn")?.addEventListener("click", () => {
 });
 $("#eden-refresh-btn")?.addEventListener("click", () => refreshEden().catch((e) => toast(e.message)));
 $("#eden-open-folder-btn")?.addEventListener("click", () => {
-  openFinderAt(state.eden?.app_root || "/data/homebrew/PPSA99008");
+  openFinderAt(state.eden?.data_root || state.eden?.paths?.data || "/data/prosperoeden");
 });
 $("#eden-install-btn")?.addEventListener("click", async () => {
   try {
@@ -4324,8 +4387,8 @@ if ("serviceWorker" in navigator) {
 }
 
 {
-  const prefs = loadPrefs();
-  // Seed settings form + migrate legacy host
+  // Prefill immédiat depuis le cache local (peut être vide en pywebview)
+  let prefs = loadPrefs();
   if (!prefs.host && localStorage.getItem("pshd-host")) {
     prefs.host = localStorage.getItem("pshd-host");
   }
@@ -4333,8 +4396,7 @@ if ("serviceWorker" in navigator) {
   applyPrefsToForm(prefs);
   applyUiMode(prefs.uiMode || "beginner");
   applyPrefsToApp(prefs, { connect: false });
-  setTheme(currentTheme());
-  // Prefill host input immediately
+  setTheme(prefs.theme || currentTheme(), { persist: false });
   if (prefs.host && $("#host")) $("#host").value = prefs.host;
   else if (localStorage.getItem("pshd-host") && $("#host")) {
     $("#host").value = localStorage.getItem("pshd-host");
@@ -4348,7 +4410,32 @@ if ("serviceWorker" in navigator) {
   refreshProfiles().catch(() => {});
   refreshLinks().catch(() => {});
   ensureAutoHenPolling();
-  if (prefs.autoConnect && (prefs.host || host())) {
-    setTimeout(() => connect().catch((e) => toast(e.message)), 450);
-  }
+
+  // Source de vérité : cache/desk-prefs.json (survit au redémarrage de l’app)
+  (async () => {
+    const server = await fetchServerPrefs();
+    if (!server || !Object.keys(server).length) {
+      // Migrer un éventuel localStorage encore présent vers le disque
+      const local = loadPrefs();
+      if (Object.keys(local).length || localStorage.getItem("pshd-host") || localStorage.getItem("pshd-theme")) {
+        const migrate = {
+          ...local,
+          host: local.host || localStorage.getItem("pshd-host") || "",
+          theme: local.theme || localStorage.getItem("pshd-theme") || currentTheme(),
+          uiMode: local.uiMode || localStorage.getItem("pshd-ui-mode") || "beginner",
+        };
+        prefs = await persistPrefs(migrate, { merge: true });
+      }
+    } else {
+      prefs = mirrorPrefsLocal({ ...loadPrefs(), ...server });
+    }
+    applyPrefsToForm(prefs);
+    applyUiMode(prefs.uiMode || "beginner");
+    applyPrefsToApp(prefs, { connect: false });
+    if (prefs.theme) setTheme(prefs.theme, { persist: false });
+    if (prefs.host && $("#host")) $("#host").value = prefs.host;
+    if (prefs.autoConnect && (prefs.host || host())) {
+      setTimeout(() => connect().catch((e) => toast(e.message)), 450);
+    }
+  })();
 }

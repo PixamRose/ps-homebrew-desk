@@ -1,4 +1,4 @@
-"""ProsperoEden hub — install + assets management over FTP (by Pixam)."""
+"""ProsperoEden hub — install + game-files under /data/prosperoeden (by Pixam)."""
 
 from __future__ import annotations
 
@@ -10,10 +10,14 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 TITLE_ID = "PPSA99008"
+# App folder (ZIP → homebrew)
 APP_ROOT = f"/data/homebrew/{TITLE_ID}"
-KEYS_DIR = f"{APP_ROOT}/assets/keys"
-FIRMWARE_DIR = f"{APP_ROOT}/assets/firmware"
-ROMS_DIR = f"{APP_ROOT}/assets/roms"
+# Game files root (keys / firmware / roms) — layout actuel ProsperoEden
+DATA_ROOT = "/data/prosperoeden"
+KEYS_DIR = f"{DATA_ROOT}/keys"
+FIRMWARE_DIR = f"{DATA_ROOT}/firmware"
+ROMS_DIR = f"{DATA_ROOT}/roms"
+UPDATES_DIR = f"{DATA_ROOT}/updates"
 GITHUB_REPO = "blackbearreloaded/ProsperoEden"
 GITHUB_API_LATEST = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
 GITHUB_API_LIST = f"https://api.github.com/repos/{GITHUB_REPO}/releases"
@@ -22,19 +26,21 @@ KIND_DIRS = {
     "keys": KEYS_DIR,
     "firmware": FIRMWARE_DIR,
     "roms": ROMS_DIR,
+    "updates": UPDATES_DIR,
 }
 
 KIND_EXTS = {
     "keys": {".keys"},
     "firmware": {".nca"},
     "roms": {".nsp", ".xci"},
+    "updates": {".nsp", ".xci"},
 }
 
 
 def dest_for_kind(kind: str) -> str:
     k = (kind or "").strip().lower()
     if k not in KIND_DIRS:
-        raise ValueError("kind invalide (keys|firmware|roms)")
+        raise ValueError("kind invalide (keys|firmware|roms|updates)")
     return KIND_DIRS[k]
 
 
@@ -42,7 +48,7 @@ def validate_paths_for_kind(kind: str, paths: List[str]) -> List[str]:
     k = (kind or "").strip().lower()
     exts = KIND_EXTS.get(k)
     if not exts:
-        raise ValueError("kind invalide (keys|firmware|roms)")
+        raise ValueError("kind invalide (keys|firmware|roms|updates)")
     out: List[str] = []
     for raw in paths or []:
         p = Path(str(raw))
@@ -98,10 +104,11 @@ def _exists_dir(ftp: FTP, path: str) -> bool:
 
 
 def status(ftp: FTP) -> Dict[str, Any]:
-    installed = _exists_dir(ftp, APP_ROOT)
-    keys = _safe_list(ftp, KEYS_DIR) if installed else []
-    firmware = _safe_list(ftp, FIRMWARE_DIR) if installed else []
-    roms = _safe_list(ftp, ROMS_DIR) if installed else []
+    app_installed = _exists_dir(ftp, APP_ROOT)
+    data_present = _exists_dir(ftp, DATA_ROOT)
+    keys = _safe_list(ftp, KEYS_DIR)
+    firmware = _safe_list(ftp, FIRMWARE_DIR)
+    roms = _safe_list(ftp, ROMS_DIR)
     key_names = {e["name"].lower() for e in keys if e["type"] == "file"}
     rom_files = [
         {"name": e["name"], "size": e["size"], "path": e["path"]}
@@ -114,12 +121,16 @@ def status(ftp: FTP) -> Dict[str, Any]:
         "ok": True,
         "title_id": TITLE_ID,
         "app_root": APP_ROOT,
-        "installed": installed,
+        "data_root": DATA_ROOT,
+        "installed": app_installed,
+        "data_present": data_present,
         "paths": {
             "app": APP_ROOT,
+            "data": DATA_ROOT,
             "keys": KEYS_DIR,
             "firmware": FIRMWARE_DIR,
             "roms": ROMS_DIR,
+            "updates": UPDATES_DIR,
         },
         "keys": {
             "prod_keys": "prod.keys" in key_names,
@@ -214,8 +225,9 @@ def assert_rom_path(path: str) -> str:
     p = (path or "").replace("\\", "/").strip()
     while "//" in p:
         p = p.replace("//", "/")
-    if not p.startswith(ROMS_DIR + "/"):
-        raise PermissionError("Suppression limitée à assets/roms/")
+    allowed_roots = (ROMS_DIR + "/", UPDATES_DIR + "/")
+    if not any(p.startswith(root) for root in allowed_roots):
+        raise PermissionError("Suppression limitée à /data/prosperoeden/roms (ou updates/)")
     if ".." in p.split("/"):
         raise ValueError("Chemin invalide")
     name = Path(p).name

@@ -28,6 +28,10 @@ def _links_path() -> Path:
     return app_root() / "cache" / "community-links.json"
 
 
+def _prefs_path() -> Path:
+    return app_root() / "cache" / "desk-prefs.json"
+
+
 def _read_json(path: Path, default: Any) -> Any:
     try:
         if path.is_file():
@@ -137,3 +141,61 @@ def save_community_links(tiktok: str = "", github: str = "", discord: str = "") 
     with _lock:
         _write_json(_links_path(), payload)
     return payload
+
+
+_ALLOWED_THEMES = frozenset({"pixam", "dark", "cyberpunk", "midnight", "light"})
+
+
+def get_prefs() -> Dict[str, Any]:
+    with _lock:
+        data = _read_json(_prefs_path(), {})
+    if not isinstance(data, dict):
+        return {}
+    return _sanitize_prefs(data)
+
+
+def save_prefs(prefs: Optional[Dict[str, Any]] = None, *, merge: bool = True) -> Dict[str, Any]:
+    incoming = prefs if isinstance(prefs, dict) else {}
+    with _lock:
+        current = _read_json(_prefs_path(), {})
+        if not isinstance(current, dict):
+            current = {}
+        next_prefs = {**current, **incoming} if merge else dict(incoming)
+        cleaned = _sanitize_prefs(next_prefs)
+        _write_json(_prefs_path(), cleaned)
+    return cleaned
+
+
+def clear_prefs() -> Dict[str, Any]:
+    with _lock:
+        _write_json(_prefs_path(), {})
+    return {}
+
+
+def _sanitize_prefs(data: Dict[str, Any]) -> Dict[str, Any]:
+    out: Dict[str, Any] = {}
+    host = str(data.get("host") or "").strip()[:64]
+    if host:
+        out["host"] = host
+    ui = str(data.get("uiMode") or "").strip().lower()
+    if ui in ("beginner", "advanced"):
+        out["uiMode"] = ui
+    theme = str(data.get("theme") or "").strip().lower()
+    if theme == "light":
+        theme = "pixam"
+    if theme in _ALLOWED_THEMES:
+        out["theme"] = theme
+    dest = str(data.get("xferDest") or "").strip()[:256]
+    if dest and ".." not in dest.split("/"):
+        out["xferDest"] = dest
+    custom = str(data.get("xferCustom") or "").strip()[:256]
+    if custom:
+        out["xferCustom"] = custom
+    try:
+        workers = int(data.get("workers"))
+        out["workers"] = max(1, min(6, workers))
+    except (TypeError, ValueError):
+        pass
+    if "autoConnect" in data:
+        out["autoConnect"] = bool(data.get("autoConnect"))
+    return out

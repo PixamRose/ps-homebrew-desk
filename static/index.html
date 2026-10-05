@@ -384,6 +384,10 @@
                 <select id="xfer-dest-preset">
                   <option value="/data/homebrew">/data/homebrew</option>
                   <option value="/data/homebrew/pkgs">/data/homebrew/pkgs</option>
+                  <option value="/data/prosperoeden">/data/prosperoeden</option>
+                  <option value="/data/prosperoeden/roms">/data/prosperoeden/roms</option>
+                  <option value="/data/prosperoeden/firmware">/data/prosperoeden/firmware</option>
+                  <option value="/data/prosperoeden/keys">/data/prosperoeden/keys</option>
                   <option value="/data">/data</option>
                   <option value="/user">/user</option>
                   <option value="/user/app">/user/app</option>
@@ -549,10 +553,11 @@
                 <button type="button" class="fav write" data-path="/data/OnionHEN"><svg class="ic fav-ic"><use href="#i-gear"/></svg> OnionHEN</button>
                 <button type="button" class="fav write" data-path="/data/ps5_autoloader"><svg class="ic fav-ic"><use href="#i-refresh"/></svg> Autoloader</button>
                 <button type="button" class="fav write" data-path="/data/shadowmount"><svg class="ic fav-ic"><use href="#i-disk"/></svg> ShadowMount</button>
-                <button type="button" class="fav write" data-path="/data/homebrew/PPSA99008"><svg class="ic fav-ic"><use href="#i-games"/></svg> ProsperoEden</button>
-                <button type="button" class="fav write" data-path="/data/homebrew/PPSA99008/assets/keys"><svg class="ic fav-ic"><use href="#i-shield"/></svg> Eden keys</button>
-                <button type="button" class="fav write" data-path="/data/homebrew/PPSA99008/assets/firmware"><svg class="ic fav-ic"><use href="#i-gear"/></svg> Eden FW</button>
-                <button type="button" class="fav write" data-path="/data/homebrew/PPSA99008/assets/roms"><svg class="ic fav-ic"><use href="#i-pkg"/></svg> Eden ROMs</button>
+                <button type="button" class="fav write" data-path="/data/prosperoeden"><svg class="ic fav-ic"><use href="#i-games"/></svg> ProsperoEden</button>
+                <button type="button" class="fav write" data-path="/data/prosperoeden/keys"><svg class="ic fav-ic"><use href="#i-shield"/></svg> Eden keys</button>
+                <button type="button" class="fav write" data-path="/data/prosperoeden/firmware"><svg class="ic fav-ic"><use href="#i-gear"/></svg> Eden FW</button>
+                <button type="button" class="fav write" data-path="/data/prosperoeden/roms"><svg class="ic fav-ic"><use href="#i-pkg"/></svg> Eden ROMs</button>
+                <button type="button" class="fav write" data-path="/data/homebrew/PPSA99008"><svg class="ic fav-ic"><use href="#i-apps"/></svg> Eden app</button>
                 <button type="button" class="fav write" data-path="/data/orbit-store"><svg class="ic fav-ic"><use href="#i-store"/></svg> Orbit Store</button>
                 <button type="button" class="fav write" data-path="/user"><svg class="ic fav-ic"><use href="#i-user"/></svg> User</button>
                 <button type="button" class="fav write" data-path="/user/app"><svg class="ic fav-ic"><use href="#i-apps"/></svg> Apps installées</button>
@@ -655,11 +660,11 @@
           <article class="surface hub-panel">
             <div class="elfs-hero">
               <div>
-                <p class="elfs-kicker">ProsperoEden · PPSA99008</p>
+                <p class="elfs-kicker">ProsperoEden · /data/prosperoeden</p>
                 <h2>Eden</h2>
                 <p class="lede">
-                  Installe ProsperoEden et envoie clés, firmware et ROMs vers
-                  <code>/data/homebrew/PPSA99008/assets/</code>. Fichiers fournis par toi — Desk ne les télécharge pas.
+                  Installe l’app (<code>PPSA99008</code>) et gère clés / firmware / ROMs dans
+                  <code>/data/prosperoeden/</code>. Fichiers fournis par toi — Desk ne les télécharge pas.
                 </p>
               </div>
               <div class="elfs-stats" id="eden-stats">
@@ -679,19 +684,19 @@
             <div class="hub-drop-grid">
               <div class="hub-drop" data-eden-kind="keys" tabindex="0">
                 <strong>Clés</strong>
-                <span class="note">prod.keys · title.keys</span>
+                <span class="note">→ /data/prosperoeden/keys</span>
                 <input type="file" id="eden-keys-input" multiple accept=".keys" hidden />
                 <button type="button" class="btn ghost" data-eden-pick="keys">Choisir…</button>
               </div>
               <div class="hub-drop" data-eden-kind="firmware" tabindex="0">
                 <strong>Firmware</strong>
-                <span class="note">fichiers .nca</span>
+                <span class="note">→ /data/prosperoeden/firmware</span>
                 <input type="file" id="eden-firmware-input" multiple accept=".nca" hidden />
                 <button type="button" class="btn ghost" data-eden-pick="firmware">Choisir…</button>
               </div>
               <div class="hub-drop" data-eden-kind="roms" tabindex="0">
                 <strong>ROMs</strong>
-                <span class="note">.nsp · .xci</span>
+                <span class="note">→ /data/prosperoeden/roms</span>
                 <input type="file" id="eden-roms-input" multiple accept=".nsp,.xci" hidden />
                 <button type="button" class="btn ghost" data-eden-pick="roms">Choisir…</button>
               </div>
@@ -929,7 +934,7 @@
 
             <h3 style="margin:1.1rem 0 0.35rem;font-size:1rem">Préremplissage</h3>
             <p class="note" style="margin:0 0 0.65rem">
-              Ces valeurs s’appliquent au démarrage et quand tu cliques Enregistrer.
+              Enregistrer écrit sur le disque (<code>cache/desk-prefs.json</code>) — les réglages survivent au redémarrage de l’app.
             </p>
             <div class="settings-grid">
               <label class="field">
@@ -949,7 +954,8 @@
                   <option value="/data/homebrew">/data/homebrew</option>
                   <option value="/data/homebrew/pkgs">/data/homebrew/pkgs</option>
                   <option value="/data/orbit-store">/data/orbit-store</option>
-                  <option value="/data/homebrew/PPSA99008/assets/roms">Eden ROMs</option>
+                  <option value="/data/prosperoeden/roms">Eden ROMs</option>
+                  <option value="/data/prosperoeden">Eden (racine)</option>
                   <option value="__custom__">Personnalisé…</option>
                 </select>
               </label>
