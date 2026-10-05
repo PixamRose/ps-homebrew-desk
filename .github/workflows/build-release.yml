@@ -1,0 +1,71 @@
+name: Build Mac + Windows release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag release (ex. v1.2.1) — vide = tag du push"
+        required: false
+        default: ""
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  mac:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build Mac zip
+        run: |
+          chmod +x scripts/make-mac-zip.sh
+          mkdir -p dist
+          scripts/make-mac-zip.sh "$PWD/PSHomebrewDesk-mac.zip"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PSHomebrewDesk-mac
+          path: PSHomebrewDesk-mac.zip
+      - name: Attach Mac zip to release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_type == 'tag' && github.ref_name || inputs.tag }}
+          files: PSHomebrewDesk-mac.zip
+          fail_on_unmatched_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt pyinstaller
+      - name: Build
+        run: python -m PyInstaller --noconfirm --distpath dist --workpath build packaging/pshomebrew-desk.spec
+      - name: Zip
+        shell: pwsh
+        run: |
+          Compress-Archive -Path dist/PSHomebrewDesk/* -DestinationPath PSHomebrewDesk-windows.zip -Force
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PSHomebrewDesk-windows
+          path: PSHomebrewDesk-windows.zip
+      - name: Attach Windows zip to release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_type == 'tag' && github.ref_name || inputs.tag }}
+          files: PSHomebrewDesk-windows.zip
+          fail_on_unmatched_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

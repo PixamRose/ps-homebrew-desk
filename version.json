@@ -1,7 +1,7 @@
 {
   "name": "PS Homebrew Desk",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "channel": "stable",
   "author": "Pixam",
-  "notes": "v1.2.0 — thèmes (Cyberpunk) · Réglages · Eden · Orbit Store · Discord — by Pixam."
+  "notes": "v1.2.1 — Eden /data/prosperoeden · réglages persistants (desk-prefs.json) — by Pixam."
 }
