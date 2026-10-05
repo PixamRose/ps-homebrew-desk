@@ -1,0 +1,27 @@
+PS Homebrew Desk — by Pixam
+===========================
+
+Prérequis communs
+- PS5 jailbreakée avec FTP (port 1337)
+- Même réseau Wi‑Fi / Ethernet que le Mac ou le PC
+
+--- Mac ---
+1. Installe Python 3.10+ si besoin
+2. Double-clic start.command
+   (ou: python3 -m pip install -r requirements.txt && python3 desktop.py)
+
+--- Windows ---
+1. Installe Python 3 depuis https://www.python.org/downloads/ (coche Add to PATH)
+2. Installe WebView2 Runtime si besoin (Edge)
+3. Double-clic start.bat
+   Pour le mode LAN: start-lan.bat
+
+Build .exe Windows (optionnel, sur un PC):
+  scripts\build-windows.bat
+  → dist\PSHomebrewDesk\PSHomebrewDesk.exe
+
+--- Payloads ---
+Place tes .elf (OnionHEN, etaHEN, etc.) dans le dossier payloads\
+
+GitHub: https://github.com/PixamRose/ps-homebrew-desk
+Releases: https://github.com/PixamRose/ps-homebrew-desk/releases
