@@ -11,14 +11,27 @@
   <link rel="icon" type="image/png" href="/app-icon.png" />
   <link rel="apple-touch-icon" href="/app-icon.png" />
   <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
   <script>
     (() => {
-      const saved = localStorage.getItem("pshd-theme");
-      const dark = saved ? saved === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
-      document.documentElement.dataset.theme = dark ? "dark" : "light";
+      const allowed = new Set(["pixam", "light", "dark", "cyberpunk", "midnight"]);
+      let saved = localStorage.getItem("pshd-theme") || "";
+      if (saved === "light") saved = "pixam";
+      if (!allowed.has(saved)) {
+        saved = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "pixam";
+      }
+      document.documentElement.dataset.theme = saved;
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) {
+        meta.content =
+          saved === "cyberpunk" ? "#fcee0a" : saved === "midnight" ? "#6c8cff" : saved === "dark" ? "#0e1518" : "#12b8a8";
+      }
     })();
   </script>
   <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/themes.css" />
 </head>
 <body>
   <!-- SF-style icon sprite -->
@@ -90,6 +103,14 @@
           <svg class="ic" aria-hidden="true"><use href="#i-games"/></svg>
           <span>Jeux</span>
         </button>
+        <button class="nav-item" data-tab="eden">
+          <svg class="ic" aria-hidden="true"><use href="#i-games"/></svg>
+          <span>Eden</span>
+        </button>
+        <button class="nav-item" data-tab="orbit">
+          <svg class="ic" aria-hidden="true"><use href="#i-store"/></svg>
+          <span>Orbit</span>
+        </button>
         <button class="nav-item" data-tab="elfs">
           <svg class="ic" aria-hidden="true"><use href="#i-elf"/></svg>
           <span>ELF</span>
@@ -102,15 +123,31 @@
           <svg class="ic" aria-hidden="true"><use href="#i-logs"/></svg>
           <span>Logs</span>
         </button>
+        <button class="nav-item" data-tab="settings">
+          <svg class="ic" aria-hidden="true"><use href="#i-gear"/></svg>
+          <span>Réglages</span>
+        </button>
       </nav>
       <div class="side-foot">
-        <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Basculer le thème">
+        <label class="mode-toggle-row">
+          <span>Mode</span>
+          <select id="ui-mode-select" aria-label="Mode interface">
+            <option value="beginner">Débutant</option>
+            <option value="advanced">Avancé</option>
+          </select>
+        </label>
+        <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Changer de thème">
           <svg class="ic" id="theme-ic-side" aria-hidden="true"><use href="#i-moon"/></svg>
-          <span id="theme-label">Mode sombre</span>
+          <span id="theme-label">Thème</span>
         </button>
         <div class="secure-badge">
           <svg class="ic tiny" aria-hidden="true"><use href="#i-shield"/></svg>
           <span>Écriture · <code>/data</code> <code>/user</code> <code>/mnt</code> · système en lecture seule</span>
+        </div>
+        <div class="side-links" id="side-community-links">
+          <a id="link-github" href="https://github.com/PixamRose/ps-homebrew-desk" target="_blank" rel="noopener">GitHub</a>
+          <a id="link-discord" href="https://discord.gg/rrQd6NKHbg" target="_blank" rel="noopener">Discord</a>
+          <a id="link-tiktok" href="#" target="_blank" rel="noopener" hidden>TikTok</a>
         </div>
       </div>
     </aside>
@@ -118,6 +155,12 @@
     <section class="main">
       <header class="toolbar">
         <form id="connect-form" class="connect-bar" autocomplete="off">
+          <label class="field profile-field advanced-only">
+            <span>Profil</span>
+            <select id="profile-select">
+              <option value="">— profil —</option>
+            </select>
+          </label>
           <label class="field">
             <span>Console</span>
             <input id="host" value="" placeholder="IP PS5 (ex. 192.168.1.x)" spellcheck="false" />
@@ -154,6 +197,24 @@
 
       <div class="content">
         <section class="panel active" id="panel-desk">
+          <article class="surface hero-welcome" id="hero-welcome">
+            <p class="elfs-kicker">by Pixam</p>
+            <h2>PS Homebrew Desk</h2>
+            <p class="lede">
+              Connecte ta PS5, envoie des fichiers en FTP, gère homebrew — simplement.
+            </p>
+            <ol class="welcome-steps">
+              <li>Renseigne l’IP console puis <strong>Connecter</strong></li>
+              <li>Glisse un fichier dans <strong>Transfert</strong> (ou Store / Lien)</li>
+              <li>Surveille la barre + les notifs quand c’est fini</li>
+            </ol>
+            <p class="note" id="link-advice">—</p>
+            <p class="note" style="margin-top:0.55rem">
+              Besoin d’aide ?
+              <a href="https://discord.gg/rrQd6NKHbg" target="_blank" rel="noopener">Rejoindre le Discord Pixam</a>
+            </p>
+          </article>
+
           <div class="status-row" id="status-strip">
             <div class="pill" data-port="ftp_1337">FTP 1337</div>
             <div class="pill" data-port="elfldr_9021">ELF 9021</div>
@@ -167,7 +228,7 @@
               <h2>Déposer un .elf</h2>
               <p>Glisse un fichier ici. Envoi uniquement vers <code>/data/homebrew</code>.</p>
               <input type="file" id="file-input" />
-              <button type="button" class="btn" id="upload-btn">Envoyer sur la console</button>
+              <button type="button" class="btn primary" id="upload-btn">Envoyer sur la console</button>
               <pre id="upload-result" class="result" hidden></pre>
             </article>
 
@@ -194,7 +255,7 @@
             </div>
             <p class="lede">
               Lance le hub en mode LAN pour ouvrir Desk depuis un Windows, un Mac ou un iPhone
-              sur le même Wi‑Fi. Publie une mise à jour quand tu veux ; les autres appareils la récupèrent.
+              sur le même Wi‑Fi.
             </p>
             <div class="network-grid">
               <div>
@@ -214,7 +275,7 @@
             </div>
             <div class="token-row" style="margin-top:0.85rem">
               <label class="field">
-                <span>Token LAN <span class="note">(DESK_TOKEN — requis si le hub le demande)</span></span>
+                <span>Token LAN <span class="note">(si le hub le demande)</span></span>
                 <input id="desk-token-input" type="password" autocomplete="off" placeholder="Colle le token ici" />
               </label>
               <div class="btn-row" style="margin-top:0.45rem">
@@ -225,11 +286,30 @@
               <p class="note" id="desk-token-status" style="margin-top:0.35rem"></p>
             </div>
             <p class="note" id="extract-tools-hint" style="margin-top:0.7rem"></p>
+
+            <div class="companion-box advanced-only" style="margin-top:1rem">
+              <h3 style="margin:0 0 0.35rem;font-size:1rem">Profils console</h3>
+              <div class="btn-row">
+                <button type="button" class="btn ghost" id="profile-save-btn">Sauver profil actuel</button>
+                <button type="button" class="btn ghost danger" id="profile-delete-btn">Supprimer profil</button>
+              </div>
+              <p class="note" id="profile-status" style="margin-top:0.4rem"></p>
+            </div>
+
+            <div class="companion-box" style="margin-top:1rem" id="about-pixam">
+              <h3 style="margin:0 0 0.35rem;font-size:1rem">À propos</h3>
+              <p class="lede" style="margin:0 0 0.55rem">
+                PS Homebrew Desk — by Pixam. Support, news et communauté sur Discord.
+              </p>
+              <div class="btn-row" style="margin-bottom:0.35rem">
+                <a class="btn primary" href="https://discord.gg/rrQd6NKHbg" target="_blank" rel="noopener">Rejoindre le Discord</a>
+                <a class="btn ghost" href="https://github.com/PixamRose/ps-homebrew-desk" target="_blank" rel="noopener">GitHub</a>
+              </div>
+            </div>
+
             <div class="btn-row" style="margin-top:0.85rem">
-              <button type="button" class="btn primary" id="publish-update-btn">Publier une mise à jour LAN</button>
               <a class="btn ghost" id="download-update-link" href="/updates/latest.zip" hidden>Télécharger latest.zip</a>
             </div>
-            <pre id="update-manifest-preview" class="result mono" hidden></pre>
             <p class="note" id="iphone-hint" style="margin-top:0.7rem"></p>
           </article>
         </section>
@@ -321,11 +401,14 @@
               </label>
               <div class="xfer-actions">
                 <button type="button" class="btn ghost" id="xfer-clear-btn" disabled>Vider</button>
+                <button type="button" class="btn ghost" id="xfer-pause-btn" hidden>Pause</button>
+                <button type="button" class="btn ghost" id="xfer-resume-btn" hidden>Reprendre</button>
                 <button type="button" class="btn ghost danger" id="xfer-cancel-btn" hidden>Annuler</button>
                 <button type="button" class="btn primary" id="start-transfer-btn" disabled>Envoyer</button>
               </div>
             </div>
             <p id="transfer-selection" class="note xfer-selection">Rien à envoyer — glisse ou choisis des fichiers.</p>
+            <p class="note" id="xfer-eta-line" hidden>ETA —</p>
 
             <div class="progress-wrap" id="transfer-progress-wrap" hidden>
               <div class="progress-stack">
@@ -338,7 +421,15 @@
                 </div>
               </div>
               <p class="progress-phase-note" id="transfer-phase-note">En attente…</p>
-              <pre id="transfer-status" class="result mono"></pre>
+              <pre id="transfer-status" class="result mono advanced-only" hidden></pre>
+            </div>
+
+            <div class="xfer-history-block">
+              <div class="row-between">
+                <h3 style="margin:0;font-size:1rem">Historique</h3>
+                <button type="button" class="btn ghost" id="xfer-history-clear">Vider</button>
+              </div>
+              <ul id="xfer-history-list" class="file-list"></ul>
             </div>
           </article>
         </section>
@@ -458,6 +549,11 @@
                 <button type="button" class="fav write" data-path="/data/OnionHEN"><svg class="ic fav-ic"><use href="#i-gear"/></svg> OnionHEN</button>
                 <button type="button" class="fav write" data-path="/data/ps5_autoloader"><svg class="ic fav-ic"><use href="#i-refresh"/></svg> Autoloader</button>
                 <button type="button" class="fav write" data-path="/data/shadowmount"><svg class="ic fav-ic"><use href="#i-disk"/></svg> ShadowMount</button>
+                <button type="button" class="fav write" data-path="/data/homebrew/PPSA99008"><svg class="ic fav-ic"><use href="#i-games"/></svg> ProsperoEden</button>
+                <button type="button" class="fav write" data-path="/data/homebrew/PPSA99008/assets/keys"><svg class="ic fav-ic"><use href="#i-shield"/></svg> Eden keys</button>
+                <button type="button" class="fav write" data-path="/data/homebrew/PPSA99008/assets/firmware"><svg class="ic fav-ic"><use href="#i-gear"/></svg> Eden FW</button>
+                <button type="button" class="fav write" data-path="/data/homebrew/PPSA99008/assets/roms"><svg class="ic fav-ic"><use href="#i-pkg"/></svg> Eden ROMs</button>
+                <button type="button" class="fav write" data-path="/data/orbit-store"><svg class="ic fav-ic"><use href="#i-store"/></svg> Orbit Store</button>
                 <button type="button" class="fav write" data-path="/user"><svg class="ic fav-ic"><use href="#i-user"/></svg> User</button>
                 <button type="button" class="fav write" data-path="/user/app"><svg class="ic fav-ic"><use href="#i-apps"/></svg> Apps installées</button>
                 <button type="button" class="fav write" data-path="/mnt/usb0"><svg class="ic fav-ic"><use href="#i-usb"/></svg> USB0</button>
@@ -553,6 +649,94 @@
               <button type="button" class="btn ghost" id="games-detail-close">Fermer</button>
             </div>
           </aside>
+        </section>
+
+        <section class="panel" id="panel-eden">
+          <article class="surface hub-panel">
+            <div class="elfs-hero">
+              <div>
+                <p class="elfs-kicker">ProsperoEden · PPSA99008</p>
+                <h2>Eden</h2>
+                <p class="lede">
+                  Installe ProsperoEden et envoie clés, firmware et ROMs vers
+                  <code>/data/homebrew/PPSA99008/assets/</code>. Fichiers fournis par toi — Desk ne les télécharge pas.
+                </p>
+              </div>
+              <div class="elfs-stats" id="eden-stats">
+                <div class="elf-stat"><strong id="eden-stat-installed">—</strong><span>app</span></div>
+                <div class="elf-stat"><strong id="eden-stat-keys">—</strong><span>clés</span></div>
+                <div class="elf-stat accent"><strong id="eden-stat-roms">0</strong><span>ROMs</span></div>
+              </div>
+            </div>
+            <div class="btn-row" style="margin-bottom:0.75rem">
+              <button type="button" class="btn primary" id="eden-install-btn">Installer / MAJ</button>
+              <button type="button" class="btn ghost" id="eden-refresh-btn">Actualiser</button>
+              <button type="button" class="btn ghost" id="eden-open-folder-btn">Ouvrir dossier</button>
+              <a class="btn ghost" id="eden-github-link" href="https://github.com/blackbearreloaded/ProsperoEden" target="_blank" rel="noopener">GitHub</a>
+            </div>
+            <p class="note" id="eden-status-note">Connecte la console puis actualise.</p>
+            <p class="note" id="eden-release-note"></p>
+            <div class="hub-drop-grid">
+              <div class="hub-drop" data-eden-kind="keys" tabindex="0">
+                <strong>Clés</strong>
+                <span class="note">prod.keys · title.keys</span>
+                <input type="file" id="eden-keys-input" multiple accept=".keys" hidden />
+                <button type="button" class="btn ghost" data-eden-pick="keys">Choisir…</button>
+              </div>
+              <div class="hub-drop" data-eden-kind="firmware" tabindex="0">
+                <strong>Firmware</strong>
+                <span class="note">fichiers .nca</span>
+                <input type="file" id="eden-firmware-input" multiple accept=".nca" hidden />
+                <button type="button" class="btn ghost" data-eden-pick="firmware">Choisir…</button>
+              </div>
+              <div class="hub-drop" data-eden-kind="roms" tabindex="0">
+                <strong>ROMs</strong>
+                <span class="note">.nsp · .xci</span>
+                <input type="file" id="eden-roms-input" multiple accept=".nsp,.xci" hidden />
+                <button type="button" class="btn ghost" data-eden-pick="roms">Choisir…</button>
+              </div>
+            </div>
+            <div class="row-between" style="margin-top:1rem">
+              <h3 style="margin:0;font-size:1rem">Bibliothèque ROMs</h3>
+              <span class="note" id="eden-roms-count">0</span>
+            </div>
+            <ul id="eden-roms-list" class="file-list"></ul>
+          </article>
+        </section>
+
+        <section class="panel" id="panel-orbit">
+          <article class="surface hub-panel">
+            <div class="elfs-hero">
+              <div>
+                <p class="elfs-kicker">Orbit Store · :34177</p>
+                <h2>Orbit</h2>
+                <p class="lede">
+                  Installe <code>orbit_store.elf</code>, lance-le via elfldr, puis ouvre l’UI web sur la console
+                  (pairage téléphone / PC). Desk n’héberge pas le catalogue Orbit.
+                </p>
+              </div>
+              <div class="elfs-stats" id="orbit-stats">
+                <div class="elf-stat"><strong id="orbit-stat-installed">—</strong><span>ELF</span></div>
+                <div class="elf-stat accent"><strong id="orbit-stat-online">—</strong><span>:34177</span></div>
+              </div>
+            </div>
+            <div class="btn-row" style="margin-bottom:0.75rem">
+              <button type="button" class="btn primary" id="orbit-install-btn">Installer / MAJ ELF</button>
+              <button type="button" class="btn ghost" id="orbit-elfldr-btn">Envoyer via elfldr :9021</button>
+              <button type="button" class="btn ghost" id="orbit-refresh-btn">Actualiser</button>
+              <button type="button" class="btn primary" id="orbit-open-btn" disabled>Ouvrir Orbit</button>
+              <button type="button" class="btn ghost" id="orbit-copy-url-btn" disabled>Copier l’URL</button>
+              <a class="btn ghost" href="https://github.com/saawant12/orbit-store-ps5/releases" target="_blank" rel="noopener">Releases</a>
+            </div>
+            <p class="note" id="orbit-status-note">Connecte la console puis actualise.</p>
+            <p class="note" id="orbit-release-note"></p>
+            <ul class="bullets muted" id="orbit-hints">
+              <li>Après lancement, ouvre Orbit depuis l’onglet Media PS5.</li>
+              <li>Sur un autre appareil : visite l’URL puis <strong>Pair devices</strong> (Show code on PS5 si besoin).</li>
+              <li>Library / ShadowMount : gérés dans Orbit, pas dans Desk.</li>
+            </ul>
+            <pre id="orbit-url-preview" class="result mono" hidden></pre>
+          </article>
         </section>
 
         <section class="panel" id="panel-elfs">
@@ -695,6 +879,99 @@
               </div>
             </div>
             <pre id="log-view" class="result mono tall">Choisis un log…</pre>
+          </article>
+        </section>
+
+        <section class="panel" id="panel-settings">
+          <article class="surface">
+            <div class="elfs-hero">
+              <div>
+                <p class="elfs-kicker">Personnalisation</p>
+                <h2>Réglages</h2>
+                <p class="lede">
+                  Choisis un thème (dont Cyberpunk 2077) et préremplis les champs utiles — IP console, destinations, workers…
+                </p>
+              </div>
+            </div>
+
+            <h3 style="margin:0 0 0.35rem;font-size:1rem">Thème</h3>
+            <p class="note" style="margin:0 0 0.55rem">Clique une carte pour appliquer immédiatement. Le choix est mémorisé.</p>
+            <div class="theme-grid" id="theme-grid">
+              <button type="button" class="theme-card" data-theme-id="pixam">
+                <div class="theme-swatches">
+                  <i style="background:#12b8a8"></i><i style="background:#e7eef0"></i><i style="background:#122027"></i>
+                </div>
+                <strong>Pixam</strong>
+                <span>Clair cyan — look Desk d’origine</span>
+              </button>
+              <button type="button" class="theme-card" data-theme-id="dark">
+                <div class="theme-swatches">
+                  <i style="background:#2ee6d6"></i><i style="background:#0e1518"></i><i style="background:#eef7f6"></i>
+                </div>
+                <strong>Sombre</strong>
+                <span>Mode nuit Pixam</span>
+              </button>
+              <button type="button" class="theme-card" data-theme-id="cyberpunk">
+                <div class="theme-swatches">
+                  <i style="background:#fcee0a"></i><i style="background:#ff2a6d"></i><i style="background:#00f0ff"></i>
+                </div>
+                <strong>Cyberpunk 2077</strong>
+                <span>Night City — jaune, scanlines, UI angulaire</span>
+              </button>
+              <button type="button" class="theme-card" data-theme-id="midnight">
+                <div class="theme-swatches">
+                  <i style="background:#6c8cff"></i><i style="background:#070b16"></i><i style="background:#e8ecff"></i>
+                </div>
+                <strong>Midnight</strong>
+                <span>Bleu profond, sobriété neon</span>
+              </button>
+            </div>
+
+            <h3 style="margin:1.1rem 0 0.35rem;font-size:1rem">Préremplissage</h3>
+            <p class="note" style="margin:0 0 0.65rem">
+              Ces valeurs s’appliquent au démarrage et quand tu cliques Enregistrer.
+            </p>
+            <div class="settings-grid">
+              <label class="field">
+                <span>IP console (PS5)</span>
+                <input id="settings-host" placeholder="192.168.1.x" spellcheck="false" autocomplete="off" />
+              </label>
+              <label class="field">
+                <span>Mode interface</span>
+                <select id="settings-ui-mode">
+                  <option value="beginner">Débutant</option>
+                  <option value="advanced">Avancé</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>Destination transfert</span>
+                <select id="settings-xfer-dest">
+                  <option value="/data/homebrew">/data/homebrew</option>
+                  <option value="/data/homebrew/pkgs">/data/homebrew/pkgs</option>
+                  <option value="/data/orbit-store">/data/orbit-store</option>
+                  <option value="/data/homebrew/PPSA99008/assets/roms">Eden ROMs</option>
+                  <option value="__custom__">Personnalisé…</option>
+                </select>
+              </label>
+              <label class="field" id="settings-xfer-custom-wrap" hidden>
+                <span>Chemin personnalisé</span>
+                <input id="settings-xfer-custom" placeholder="/data/…" spellcheck="false" />
+              </label>
+              <label class="field">
+                <span>Workers FTP</span>
+                <input id="settings-workers" type="number" min="1" max="6" value="3" />
+              </label>
+              <label class="field check-row" style="display:flex;gap:0.5rem;align-items:center;margin-top:1.4rem">
+                <input type="checkbox" id="settings-auto-connect" />
+                <span>Auto-connecter à l’IP au lancement</span>
+              </label>
+            </div>
+            <div class="settings-actions">
+              <button type="button" class="btn primary" id="settings-save-btn">Enregistrer les réglages</button>
+              <button type="button" class="btn ghost" id="settings-apply-btn">Appliquer maintenant</button>
+              <button type="button" class="btn ghost" id="settings-reset-btn">Réinitialiser</button>
+            </div>
+            <p class="note" id="settings-status"></p>
           </article>
         </section>
       </div>

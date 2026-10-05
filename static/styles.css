@@ -1,21 +1,22 @@
-:root, html[data-theme="light"] {
-  --bg: #e8eaed;
-  --bg-side: rgba(246, 246, 248, 0.78);
-  --surface: rgba(255, 255, 255, 0.72);
-  --ink: #1d1d1f;
-  --muted: #6e6e73;
-  --line: rgba(0, 0, 0, 0.08);
-  --accent: #007aff;
-  --accent-soft: rgba(0, 122, 255, 0.12);
+/* Palette tokens live in themes.css (pixam / dark / cyberpunk / midnight). */
+:root {
+  --bg: #e7eef0;
+  --bg-side: rgba(240, 248, 250, 0.86);
+  --surface: rgba(255, 255, 255, 0.78);
+  --ink: #122027;
+  --muted: #5b6b73;
+  --line: rgba(10, 40, 48, 0.1);
+  --accent: #12b8a8;
+  --accent-soft: rgba(18, 184, 168, 0.14);
   --ok: #34c759;
   --bad: #ff3b30;
   --warn: #ff9f0a;
-  --shadow: 0 10px 40px rgba(0, 0, 0, 0.08), 0 1px 0 rgba(255,255,255,0.6) inset;
-  --code: #0060df;
-  --code-bg: rgba(0, 0, 0, 0.04);
-  --glow-a: rgba(0, 122, 255, 0.12);
-  --glow-b: rgba(52, 199, 89, 0.08);
-  --nav-active: #0060df;
+  --shadow: 0 10px 40px rgba(10, 40, 48, 0.08), 0 1px 0 rgba(255,255,255,0.6) inset;
+  --code: #0b7f74;
+  --code-bg: rgba(18, 184, 168, 0.08);
+  --glow-a: rgba(18, 184, 168, 0.16);
+  --glow-b: rgba(46, 230, 214, 0.1);
+  --nav-active: #0b7f74;
   --chip-ok-ink: #0b6b2c;
   --chip-bad-ink: #9b1c1c;
   --warn-ink: #9a5b00;
@@ -23,32 +24,8 @@
   --radius: 12px;
   --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", sans-serif;
   --mono: "SF Mono", ui-monospace, Menlo, monospace;
+  --heading-font: var(--font);
   color-scheme: light;
-}
-
-html[data-theme="dark"] {
-  --bg: #1c1c1e;
-  --bg-side: rgba(28, 28, 30, 0.86);
-  --surface: rgba(44, 44, 46, 0.82);
-  --ink: #f5f5f7;
-  --muted: #98989d;
-  --line: rgba(255, 255, 255, 0.1);
-  --accent: #0a84ff;
-  --accent-soft: rgba(10, 132, 255, 0.18);
-  --ok: #30d158;
-  --bad: #ff453a;
-  --warn: #ff9f0a;
-  --shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
-  --code: #6cb6ff;
-  --code-bg: rgba(255, 255, 255, 0.06);
-  --glow-a: rgba(10, 132, 255, 0.16);
-  --glow-b: rgba(48, 209, 88, 0.08);
-  --nav-active: #7cb7ff;
-  --chip-ok-ink: #8ef0ad;
-  --chip-bad-ink: #ff8e86;
-  --warn-ink: #ffb340;
-  --input-bg: rgba(0, 0, 0, 0.28);
-  color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
@@ -63,6 +40,9 @@ html, body {
     var(--bg);
   overflow: hidden;
   user-select: none;
+}
+h1, h2, h3 {
+  font-family: var(--heading-font, var(--font));
 }
 
 code {
@@ -1728,4 +1708,91 @@ a.btn {
     flex-wrap: wrap;
   }
   .content { padding-bottom: 2rem; }
+}
+
+/* Pixam UX additions */
+.hero-welcome {
+  background:
+    radial-gradient(120% 80% at 0% 0%, var(--glow-a), transparent 55%),
+    radial-gradient(90% 70% at 100% 20%, var(--glow-b), transparent 50%),
+    var(--surface);
+  margin-bottom: 0.85rem;
+}
+.welcome-steps {
+  margin: 0.6rem 0 0.4rem 1.1rem;
+  color: var(--ink);
+  line-height: 1.45;
+}
+.mode-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.45rem;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+.mode-toggle-row select {
+  flex: 1;
+  min-width: 0;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--input-bg);
+  color: var(--ink);
+  padding: 0.3rem 0.4rem;
+}
+.side-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.55rem;
+}
+.side-links a {
+  color: var(--accent);
+  font-size: 0.78rem;
+  text-decoration: none;
+  font-weight: 650;
+}
+.side-links a:hover { text-decoration: underline; }
+html[data-ui-mode="beginner"] .advanced-only { display: none !important; }
+.xfer-history-block { margin-top: 1rem; }
+.xfer-history-block .file-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  align-items: center;
+}
+.history-retry {
+  flex-shrink: 0;
+}
+
+.hub-drop-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.65rem;
+  margin-top: 0.75rem;
+}
+@media (max-width: 900px) {
+  .hub-drop-grid { grid-template-columns: 1fr; }
+}
+.hub-drop {
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+  padding: 0.85rem;
+  background: var(--accent-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-height: 7.5rem;
+}
+.hub-drop.drag {
+  border-color: var(--accent);
+  outline: 2px solid var(--accent);
+}
+.hub-drop strong { font-size: 0.95rem; }
+.hub-panel .file-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  align-items: center;
 }

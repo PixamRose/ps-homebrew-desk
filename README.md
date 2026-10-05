@@ -118,6 +118,7 @@ pshomebrew-desk/
 ├── desk/                   # Code applicatif
 │   ├── common.py           # Chemins, version, LAN, notifs
 │   ├── transfer.py         # FTP / archives / jobs
+│   ├── companion.py        # Push statut → Pixam Console ELF :9123
 │   ├── games.py · elfs.py  # Jeux & outils .elf
 │   ├── relapse.py          # Host Relapse (optionnel)
 │   └── update_channel.py   # Mises à jour LAN
@@ -155,7 +156,18 @@ pshomebrew-desk/
 - Store local + SHA-256
 - Transfert FTP, liens → download → extract local → upload
 - Hub LAN + updates + PWA iPhone
+- **Companion console** — push TCP des transferts vers `pixam-console.elf` (`:9123`)
 - Signature **by Pixam**
+
+### Companion console (Pixam ELF)
+
+1. Build l’ELF : voir le dossier voisin `pixam-console/` (`make` + `PS5_PAYLOAD_SDK`)
+2. Copie `pixam-console.elf` dans `payloads/`
+3. OnionHEN + elfldr `:9021` → Desk envoie l’ELF
+4. Onglet **Desk → Companion console** → ON (IP = IP PS5)
+5. Les transferts Desk affichent progression / ETA sur la console ; l’ELF permet aussi de parcourir `/data`, `/user`, `/mnt`
+
+API utiles : `GET /api/transfer/jobs`, `GET|POST /api/companion`.
 
 ### Archives (onglet Lien)
 

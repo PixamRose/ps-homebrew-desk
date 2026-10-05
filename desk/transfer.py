@@ -162,8 +162,12 @@ def upload_file(
     remote_path: str,
     on_bytes: Optional[Callable[[int], None]] = None,
     should_cancel: Optional[Callable[[], bool]] = None,
+    resume: bool = True,
 ) -> int:
-    """High-speed local file → FTP using mmap + raw data-socket sendall."""
+    """High-speed local file → FTP using mmap + raw data-socket sendall.
+
+    If resume=True and the remote partial file exists (SIZE), try REST + STOR.
+    """
     remote_path = _safe_remote(remote_path)
     parent = remote_path.rsplit("/", 1)[0]
     sent = 0
@@ -178,6 +182,20 @@ def upload_file(
         if file_size == 0:
             ftp.storbinary(f"STOR {remote_path}", local_path.open("rb"), blocksize=BLOCKSIZE)
             return 0
+        pos = 0
+        if resume:
+            try:
+                remote_size = ftp.size(remote_path)
+            except Exception:
+                remote_size = None
+            if isinstance(remote_size, int) and 0 < remote_size < file_size:
+                try:
+                    ftp.sendcmd(f"REST {remote_size}")
+                    pos = remote_size
+                    sent = remote_size
+                except Exception:
+                    pos = 0
+                    sent = 0
         data = ftp.transfercmd(f"STOR {remote_path}")
         _tune_sock(data)
         try:
@@ -191,7 +209,6 @@ def upload_file(
                 # Some Windows files / FS don't support mmap — buffered fallback.
                 mm = None
             try:
-                pos = 0
                 while pos < file_size:
                     if should_cancel and should_cancel():
                         raise TransferCancelled("Annulé par l’utilisateur")
@@ -371,8 +388,9 @@ class TransferJob:
     kind: str = "transfer"
     remote_path: str = ""
     cancel_requested: bool = False
+    pause_requested: bool = False
     cleaned: bool = False
-    # UI phases: queued | download | extract | upload | done | error | cancelled
+    # UI phases: queued | download | extract | upload | done | error | cancelled | paused
     phase: str = "queued"
     download_bytes: int = 0
     download_total: int = 0
@@ -380,6 +398,10 @@ class TransferJob:
     upload_total: int = 0
     extract_bytes: int = 0
     extract_total: int = 0
+    # For retry / history
+    source_paths: List[str] = field(default_factory=list)
+    dest_root: str = HOMEBREW_ROOT
+    source_url: str = ""
     _lock: threading.Lock = field(default_factory=threading.Lock, repr=False)
 
     def snapshot(self) -> dict:
@@ -440,12 +462,17 @@ class TransferJob:
                 "current": self.current,
                 "remote_path": self.remote_path,
                 "cancel_requested": self.cancel_requested,
+                "pause_requested": self.pause_requested,
                 "errors": list(self.errors),
                 "workers": self.workers,
                 "mbps": round(mbps, 2),
                 "percent": round((self.sent_bytes / self.total_bytes) * 100, 1) if self.total_bytes else 0.0,
                 "started_at": self.started_at,
+                "finished_at": self.finished_at,
                 "eta_seconds": eta_seconds,
+                "source_paths": list(self.source_paths),
+                "dest_root": self.dest_root,
+                "source_url": self.source_url,
             }
 
 
@@ -454,9 +481,50 @@ def get_job(job_id: str) -> Optional[TransferJob]:
         return _jobs.get(job_id)
 
 
+def list_jobs(limit: int = 40) -> List[dict]:
+    """Recent / active transfer jobs (newest first)."""
+    with _jobs_lock:
+        jobs = list(_jobs.values())
+    jobs.sort(key=lambda j: j.started_at or 0.0, reverse=True)
+    out: List[dict] = []
+    for job in jobs[: max(1, min(200, limit))]:
+        try:
+            out.append(job.snapshot())
+        except Exception:
+            continue
+    return out
+
+
+def _companion_notify(job: "TransferJob", *, force: bool = False) -> None:
+    try:
+        from desk import companion as companion_mod
+
+        companion_mod.notify_job_obj(job, force=force)
+    except Exception:
+        pass
+
+
 def job_is_cancelled(job: TransferJob) -> bool:
     with job._lock:
         return bool(job.cancel_requested)
+
+
+def job_wait_if_paused(job: TransferJob) -> None:
+    """Block upload progress while pause_requested (cooperative pause)."""
+    while True:
+        with job._lock:
+            if job.cancel_requested:
+                return
+            if not job.pause_requested:
+                if job.status == "paused":
+                    job.status = "running"
+                    if job.phase == "paused":
+                        job.phase = "upload"
+                return
+            job.status = "paused"
+            job.phase = "paused"
+            job.current = "en pause…"
+        time.sleep(0.25)
 
 
 def cancel_job(job_id: str) -> Optional[TransferJob]:
@@ -467,10 +535,72 @@ def cancel_job(job_id: str) -> Optional[TransferJob]:
         if job.status in ("done", "done_with_errors", "error", "cancelled"):
             return job
         job.cancel_requested = True
-        if job.status in ("queued", "running", "cancelling"):
+        job.pause_requested = False
+        if job.status in ("queued", "running", "cancelling", "paused"):
             job.status = "cancelling"
             job.current = "annulation…"
     return job
+
+
+def pause_job(job_id: str) -> Optional[TransferJob]:
+    job = get_job(job_id)
+    if not job:
+        return None
+    with job._lock:
+        if job.status not in ("queued", "running", "paused", "cancelling"):
+            return job
+        if job.status == "cancelling":
+            return job
+        job.pause_requested = True
+        job.status = "paused"
+        job.phase = "paused"
+        job.current = "en pause…"
+    _companion_notify(job, force=True)
+    return job
+
+
+def resume_job(job_id: str) -> Optional[TransferJob]:
+    job = get_job(job_id)
+    if not job:
+        return None
+    with job._lock:
+        if not job.pause_requested and job.status != "paused":
+            return job
+        job.pause_requested = False
+        if job.status == "paused":
+            job.status = "running"
+            job.phase = "upload"
+            job.current = "reprise…"
+    _companion_notify(job, force=True)
+    return job
+
+
+def _finish_job_side_effects(job: TransferJob) -> None:
+    """History + desktop notification when a job ends."""
+    try:
+        snap = job.snapshot()
+    except Exception:
+        return
+    try:
+        from desk import history as history_mod
+
+        history_mod.append_history(snap)
+    except Exception:
+        pass
+    status = str(snap.get("status") or "")
+    if status in ("done", "done_with_errors", "error", "cancelled"):
+        try:
+            from desk.common import desktop_notify
+
+            name = snap.get("current") or snap.get("remote_path") or snap.get("id") or "transfert"
+            if status.startswith("done"):
+                desktop_notify("PS Homebrew Desk", f"Terminé · {name}")
+            elif status == "cancelled":
+                desktop_notify("PS Homebrew Desk", f"Annulé · {name}")
+            else:
+                desktop_notify("PS Homebrew Desk", f"Erreur · {name}")
+        except Exception:
+            pass
 
 
 def ftp_delete_quiet(host: str, remote_path: str) -> bool:
@@ -509,6 +639,8 @@ def start_transfer(host: str, paths: List[str], dest_root: str = HOMEBREW_ROOT, 
     job = TransferJob(id=uuid.uuid4().hex[:12], host=host, workers=workers)
     job.total_files = len(items)
     job.total_bytes = sum(p.stat().st_size for p, _ in items)
+    job.source_paths = [str(p) for p in paths]
+    job.dest_root = dest_root
     with _jobs_lock:
         _jobs[job.id] = job
 
@@ -1164,6 +1296,8 @@ def start_url_transfer(
     job.total_files = 1
     job.current = name
     job.remote_path = remote
+    job.source_url = url
+    job.dest_root = dest_root
     with _jobs_lock:
         _jobs[job.id] = job
     threading.Thread(
@@ -1231,8 +1365,17 @@ def _run_url_job(
     try:
         if job_is_cancelled(job):
             raise TransferCancelled("Annulé par l’utilisateur")
-        req = urllib.request.Request(url, headers={"User-Agent": "PS-Homebrew-Desk/1.0"})
-        with urllib.request.urlopen(req, timeout=120) as resp:
+        # Small HTTP chunks: BLOCKSIZE (16MiB) can exceed socket timeout on slow links.
+        http_chunk = 256 * 1024
+        req = urllib.request.Request(
+            url,
+            headers={
+                "User-Agent": "PSHomebrewDesk/Pixam",
+                "Accept": "*/*",
+                "Accept-Encoding": "identity",
+            },
+        )
+        with urllib.request.urlopen(req, timeout=600) as resp:
             total = int(resp.headers.get("Content-Length") or 0)
             with job._lock:
                 job.phase = "download"
@@ -1247,7 +1390,7 @@ def _run_url_job(
                 while True:
                     if job_is_cancelled(job):
                         raise TransferCancelled("Annulé pendant le téléchargement")
-                    chunk = resp.read(BLOCKSIZE)
+                    chunk = resp.read(http_chunk)
                     if not chunk:
                         break
                     out.write(chunk)
@@ -1356,12 +1499,14 @@ def _run_url_job(
                 with job._lock:
                     job.sent_bytes += n
                     job.upload_bytes += n
+                _companion_notify(job, force=False)
 
             for idx, (local, remote_path) in enumerate(items, start=1):
                 if job_is_cancelled(job):
                     raise TransferCancelled("Annulé pendant l’upload")
                 with job._lock:
                     job.current = f"upload · {idx}/{len(items)} · {local.name}"
+                _companion_notify(job, force=True)
                 upload_started = True
                 upload_file(
                     job.host,
@@ -1380,6 +1525,7 @@ def _run_url_job(
                 job.current = (
                     f"{remote_display} · {len(items)} fichier(s) · {_fmt_bytes(upload_bytes)}"
                 )
+            _companion_notify(job, force=True)
         else:
             downloaded = tmp_path.stat().st_size
             with job._lock:
@@ -1396,7 +1542,9 @@ def _run_url_job(
                 with job._lock:
                     job.sent_bytes += n
                     job.upload_bytes += n
+                _companion_notify(job, force=False)
             upload_started = True
+            _companion_notify(job, force=True)
             upload_file(
                 job.host,
                 tmp_path,
@@ -1413,6 +1561,7 @@ def _run_url_job(
                 job.phase = "done"
                 job.upload_bytes = max(job.upload_bytes, job.upload_total)
                 job.current = remote
+            _companion_notify(job, force=True)
     except TransferCancelled as exc:
         _cleanup_url_job(
             job,
@@ -1452,6 +1601,8 @@ def _run_url_job(
         _rm_tree(tmp_path)
         _rm_tree(extract_dir)
         job.finished_at = time.time()
+        _companion_notify(job, force=True)
+        _finish_job_side_effects(job)
 
 
 def _run_job(job: TransferJob, items: List[Tuple[Path, str]]) -> None:
@@ -1467,16 +1618,23 @@ def _run_job(job: TransferJob, items: List[Tuple[Path, str]]) -> None:
         job.download_bytes = 0
 
     def add_bytes(n: int) -> None:
+        job_wait_if_paused(job)
+        if job_is_cancelled(job):
+            return
         with job._lock:
             job.sent_bytes += n
             job.upload_bytes += n
+        _companion_notify(job, force=False)
 
     def one(local: Path, remote: str) -> None:
+        job_wait_if_paused(job)
         if job_is_cancelled(job):
             raise TransferCancelled("Annulé par l’utilisateur")
         with job._lock:
             job.phase = "upload"
             job.current = local.name
+            job.remote_path = remote
+        _companion_notify(job, force=True)
         try:
             upload_file(
                 job.host,
@@ -1487,13 +1645,16 @@ def _run_job(job: TransferJob, items: List[Tuple[Path, str]]) -> None:
             )
             with job._lock:
                 job.done_files += 1
+            _companion_notify(job, force=True)
         except TransferCancelled:
             raise
         except Exception as exc:  # noqa: BLE001
             with job._lock:
                 job.errors.append(f"{local.name}: {exc}")
                 job.done_files += 1
+            _companion_notify(job, force=True)
 
+    _companion_notify(job, force=True)
     try:
         with ThreadPoolExecutor(max_workers=job.workers) as pool:
             futures = [pool.submit(one, local, remote) for local, remote in items]
@@ -1525,3 +1686,5 @@ def _run_job(job: TransferJob, items: List[Tuple[Path, str]]) -> None:
             job.errors.append(str(exc))
     finally:
         job.finished_at = time.time()
+        _companion_notify(job, force=True)
+        _finish_job_side_effects(job)

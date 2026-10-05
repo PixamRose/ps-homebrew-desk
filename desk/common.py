@@ -257,6 +257,74 @@ def read_update_manifest() -> Optional[Dict[str, Any]]:
         return None
 
 
+def link_kind_hint() -> Dict[str, Any]:
+    """Best-effort: ethernet vs wifi for local machine (Mac/Windows)."""
+    plat = host_platform()
+    kind = "unknown"
+    detail = ""
+    try:
+        if plat == "mac":
+            for iface in ("en0", "en1", "en2", "en3"):
+                try:
+                    out = subprocess.check_output(
+                        ["networksetup", "-getairportnetwork", iface],
+                        text=True,
+                        stderr=subprocess.DEVNULL,
+                        timeout=2,
+                    )
+                    if "Wi-Fi" in out or "Current Wi-Fi" in out or "Airport" in out:
+                        # if this iface has an IP, likely wifi
+                        ip = subprocess.check_output(
+                            ["ipconfig", "getifaddr", iface], text=True, stderr=subprocess.DEVNULL, timeout=1
+                        ).strip()
+                        if ip:
+                            kind = "wifi"
+                            detail = f"{iface} · {ip}"
+                            break
+                except Exception:
+                    continue
+            if kind == "unknown":
+                # Prefer non-wifi en* with IP
+                for iface in ("en0", "en1", "en2", "en3", "bridge0"):
+                    try:
+                        ip = subprocess.check_output(
+                            ["ipconfig", "getifaddr", iface], text=True, stderr=subprocess.DEVNULL, timeout=1
+                        ).strip()
+                        if ip and not ip.startswith("127."):
+                            kind = "ethernet"
+                            detail = f"{iface} · {ip}"
+                            break
+                    except Exception:
+                        continue
+        elif plat == "windows":
+            ps = (
+                "Get-NetAdapter | Where-Object Status -eq 'Up' | "
+                "Select-Object -First 3 Name,InterfaceDescription,LinkSpeed | ConvertTo-Json -Compress"
+            )
+            out = subprocess.check_output(
+                ["powershell", "-NoProfile", "-Command", ps],
+                text=True,
+                stderr=subprocess.DEVNULL,
+                timeout=6,
+            ).strip()
+            low = out.lower()
+            if "wi-fi" in low or "wifi" in low or "wireless" in low:
+                kind = "wifi"
+            elif "ethernet" in low or "realtek" in low or "intel(r) ethernet" in low:
+                kind = "ethernet"
+            detail = out[:180]
+    except Exception as exc:
+        detail = str(exc)[:120]
+    advice = ""
+    if kind == "wifi":
+        advice = "Wi‑Fi détecté — pour ~100 Mo/s, passe en Ethernet (Mac ou PS5)."
+    elif kind == "ethernet":
+        advice = "Ethernet détecté — bon pour les gros transferts."
+    else:
+        advice = "Type de lien inconnu — Ethernet recommandé pour les gros PKG/NSP."
+    return {"ok": True, "kind": kind, "detail": detail, "advice": advice}
+
+
 def desk_runtime_info(prefer_host: str = "") -> Dict[str, Any]:
     ver = load_version()
     ip = local_ip(prefer_host)
@@ -269,6 +337,13 @@ def desk_runtime_info(prefer_host: str = "") -> Dict[str, Any]:
         extract = list_extract_tools()
     except Exception:
         extract = {}
+    companion = {}
+    try:
+        from desk import companion as companion_mod
+
+        companion = companion_mod.status_payload()
+    except Exception:
+        companion = {"ok": False, "enabled": False}
     return {
         "ok": True,
         "name": ver.get("name"),
@@ -288,6 +363,8 @@ def desk_runtime_info(prefer_host: str = "") -> Dict[str, Any]:
         "token_required": bool(desk_token()),
         "update": manifest,
         "extract": extract,
+        "companion": companion,
+        "link": link_kind_hint(),
         "iphone_hint": "Sur iPhone: Safari → partager → Sur l’écran d’accueil (PWA).",
         "windows_hint": "Windows: PSHomebrewDesk.exe (recommandé) ou start.bat + Python + WebView2.",
     }

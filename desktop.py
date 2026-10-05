@@ -66,6 +66,29 @@ class DeskApi:
             return []
         return [str(p) for p in result]
 
+    def open_external(self, url: str = "") -> dict:
+        """Open http(s) URL in the system browser (window.open is a no-op in pywebview)."""
+        import webbrowser
+        from urllib.parse import urlparse
+
+        u = (url or "").strip()
+        parsed = urlparse(u)
+        if parsed.scheme not in ("http", "https") or not parsed.netloc:
+            return {"ok": False, "error": "URL invalide"}
+        try:
+            ok = webbrowser.open(u)
+            if not ok and host_platform() == "mac":
+                import subprocess
+
+                subprocess.run(["open", u], check=False)
+                ok = True
+            elif not ok and host_platform() == "windows":
+                os.startfile(u)  # type: ignore[attr-defined]
+                ok = True
+            return {"ok": bool(ok), "url": u}
+        except Exception as exc:  # noqa: BLE001
+            return {"ok": False, "error": str(exc), "url": u}
+
 
 def port_open(timeout: float = 0.3) -> bool:
     try:

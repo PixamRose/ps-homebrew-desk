@@ -65,8 +65,31 @@ $("#host").value = state.host;
   }
 })();
 
+const THEME_ORDER = ["pixam", "dark", "cyberpunk", "midnight"];
+const THEME_LABELS = {
+  pixam: "Pixam",
+  light: "Pixam",
+  dark: "Sombre",
+  cyberpunk: "Cyberpunk",
+  midnight: "Midnight",
+};
+const THEME_META_COLORS = {
+  pixam: "#12b8a8",
+  light: "#12b8a8",
+  dark: "#0e1518",
+  cyberpunk: "#fcee0a",
+  midnight: "#6c8cff",
+};
+
+function normalizeTheme(theme) {
+  let t = String(theme || "").trim().toLowerCase();
+  if (t === "light") t = "pixam";
+  if (!THEME_ORDER.includes(t)) t = "pixam";
+  return t;
+}
+
 function currentTheme() {
-  return document.documentElement.dataset.theme === "dark" ? "dark" : "light";
+  return normalizeTheme(document.documentElement.dataset.theme || localStorage.getItem("pshd-theme"));
 }
 
 function setThemeIcon(el, name) {
@@ -76,28 +99,112 @@ function setThemeIcon(el, name) {
 }
 
 function syncThemeLabels() {
-  const dark = currentTheme() === "dark";
+  const t = currentTheme();
   const label = $("#theme-label");
-  if (label) label.textContent = dark ? "Mode clair" : "Mode sombre";
-  const icon = dark ? "sun" : "moon";
+  if (label) label.textContent = THEME_LABELS[t] || "Thème";
+  const icon = t === "pixam" ? "sun" : "moon";
   setThemeIcon($("#theme-ic-side"), icon);
   setThemeIcon($("#theme-ic-bar"), icon);
+  $$(".theme-card").forEach((card) => {
+    card.classList.toggle("active", card.getAttribute("data-theme-id") === t);
+  });
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.content = THEME_META_COLORS[t] || "#12b8a8";
 }
 
 function setTheme(theme) {
-  const next = theme === "dark" ? "dark" : "light";
+  const next = normalizeTheme(theme);
   document.documentElement.dataset.theme = next;
   localStorage.setItem("pshd-theme", next);
   syncThemeLabels();
 }
 
-function toggleTheme() {
-  setTheme(currentTheme() === "dark" ? "light" : "dark");
+function cycleTheme() {
+  const cur = currentTheme();
+  const idx = THEME_ORDER.indexOf(cur);
+  setTheme(THEME_ORDER[(idx + 1) % THEME_ORDER.length]);
+  toast(`Thème · ${THEME_LABELS[currentTheme()]}`);
+}
+
+function loadPrefs() {
+  try {
+    const raw = localStorage.getItem("pshd-prefs");
+    if (!raw) return {};
+    const data = JSON.parse(raw);
+    return data && typeof data === "object" ? data : {};
+  } catch {
+    return {};
+  }
+}
+
+function savePrefs(partial) {
+  const next = { ...loadPrefs(), ...partial };
+  localStorage.setItem("pshd-prefs", JSON.stringify(next));
+  return next;
+}
+
+function applyPrefsToForm(prefs = loadPrefs()) {
+  if (prefs.host != null && $("#settings-host")) $("#settings-host").value = prefs.host;
+  if (prefs.uiMode && $("#settings-ui-mode")) $("#settings-ui-mode").value = prefs.uiMode;
+  if (prefs.xferDest && $("#settings-xfer-dest")) {
+    const known = [...($("#settings-xfer-dest").options || [])].some((o) => o.value === prefs.xferDest);
+    if (known) {
+      $("#settings-xfer-dest").value = prefs.xferDest;
+      if ($("#settings-xfer-custom-wrap")) $("#settings-xfer-custom-wrap").hidden = true;
+    } else {
+      $("#settings-xfer-dest").value = "__custom__";
+      if ($("#settings-xfer-custom-wrap")) $("#settings-xfer-custom-wrap").hidden = false;
+      if ($("#settings-xfer-custom")) $("#settings-xfer-custom").value = prefs.xferDest;
+    }
+  }
+  if (prefs.xferCustom != null && $("#settings-xfer-custom")) $("#settings-xfer-custom").value = prefs.xferCustom;
+  if (prefs.workers != null && $("#settings-workers")) $("#settings-workers").value = String(prefs.workers);
+  if ($("#settings-auto-connect")) $("#settings-auto-connect").checked = !!prefs.autoConnect;
+}
+
+function readSettingsForm() {
+  const destSel = $("#settings-xfer-dest")?.value || "/data/homebrew";
+  const custom = ($("#settings-xfer-custom")?.value || "").trim();
+  return {
+    host: ($("#settings-host")?.value || "").trim(),
+    uiMode: $("#settings-ui-mode")?.value === "advanced" ? "advanced" : "beginner",
+    xferDest: destSel === "__custom__" ? custom || "/data/homebrew" : destSel,
+    xferCustom: custom,
+    workers: Math.max(1, Math.min(6, Number($("#settings-workers")?.value || 3) || 3)),
+    autoConnect: !!$("#settings-auto-connect")?.checked,
+  };
+}
+
+function applyPrefsToApp(prefs = loadPrefs(), { connect = false } = {}) {
+  if (prefs.host) {
+    if ($("#host")) $("#host").value = prefs.host;
+    state.host = prefs.host;
+    localStorage.setItem("pshd-host", prefs.host);
+  }
+  if (prefs.uiMode) applyUiMode(prefs.uiMode);
+  if (prefs.workers != null && $("#transfer-workers")) {
+    $("#transfer-workers").value = String(prefs.workers);
+  }
+  if (prefs.xferDest && $("#xfer-dest-preset")) {
+    const known = [...$("#xfer-dest-preset").options].some((o) => o.value === prefs.xferDest);
+    if (known) {
+      $("#xfer-dest-preset").value = prefs.xferDest;
+      if ($("#xfer-dest-custom-wrap")) $("#xfer-dest-custom-wrap").hidden = true;
+    } else {
+      $("#xfer-dest-preset").value = "__custom__";
+      if ($("#xfer-dest-custom-wrap")) $("#xfer-dest-custom-wrap").hidden = false;
+      if ($("#xfer-dest-custom")) $("#xfer-dest-custom").value = prefs.xferDest;
+    }
+    updateTransferSelection?.();
+  }
+  if (connect && prefs.autoConnect && prefs.host) {
+    connect().catch((e) => toast(e.message));
+  }
 }
 
 syncThemeLabels();
-$("#theme-toggle")?.addEventListener("click", toggleTheme);
-$("#theme-toggle-bar")?.addEventListener("click", toggleTheme);
+$("#theme-toggle")?.addEventListener("click", cycleTheme);
+$("#theme-toggle-bar")?.addEventListener("click", cycleTheme);
 
 function host() {
   return ($("#host").value || "").trim() || "";
@@ -137,6 +244,144 @@ function syncTokenField() {
       ? "Token enregistré dans ce navigateur (header X-PSHD-Token)."
       : "Aucun token local — nécessaire seulement si DESK_TOKEN est défini sur le hub.";
   }
+}
+
+function applyUiMode(mode) {
+  const m = mode === "advanced" ? "advanced" : "beginner";
+  document.documentElement.dataset.uiMode = m;
+  localStorage.setItem("pshd-ui-mode", m);
+  if ($("#ui-mode-select")) $("#ui-mode-select").value = m;
+}
+
+async function refreshHistory() {
+  const list = $("#xfer-history-list");
+  if (!list) return;
+  try {
+    const data = await api("/api/transfer/history?limit=30");
+    const rows = data.history || [];
+    if (!rows.length) {
+      list.innerHTML = `<li><span class="note">Aucun transfert enregistré</span></li>`;
+      return;
+    }
+    list.innerHTML = rows
+      .map((j) => {
+        const st = escapeHtml(String(j.status || "?"));
+        const name = escapeHtml(String(j.current || j.remote_path || j.id || "job"));
+        const canRetry = (j.source_paths && j.source_paths.length) || j.source_url;
+        return `<li>
+          <span><strong>${st}</strong> · ${name}<br><span class="meta">${escapeHtml(String(j.host || ""))} · ${escapeHtml(String(j.dest_root || ""))}</span></span>
+          ${canRetry ? `<button type="button" class="btn ghost history-retry" data-retry-id="${escapeHtml(j.id)}">Retry</button>` : ""}
+        </li>`;
+      })
+      .join("");
+    list.querySelectorAll("[data-retry-id]").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        try {
+          const data = await api("/api/transfer/retry", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: btn.getAttribute("data-retry-id"), host: host() }),
+          });
+          toast("Relance…");
+          if (data.job?.id) {
+            state.transferJobId = data.job.id;
+            pollJob(data.job.id);
+          }
+          refreshHistory().catch(() => {});
+        } catch (err) {
+          toast(err.message);
+        }
+      });
+    });
+  } catch (err) {
+    list.innerHTML = `<li><span class="note">${escapeHtml(err.message)}</span></li>`;
+  }
+}
+
+async function refreshProfiles() {
+  try {
+    const data = await api("/api/profiles");
+    const sel = $("#profile-select");
+    if (!sel) return;
+    const profiles = data.profiles || [];
+    const active = data.active || "";
+    sel.innerHTML =
+      `<option value="">— profil —</option>` +
+      profiles
+        .map(
+          (p) =>
+            `<option value="${escapeHtml(p.name)}" ${p.name === active ? "selected" : ""}>${escapeHtml(p.name)} · ${escapeHtml(p.host)}</option>`
+        )
+        .join("");
+    state.profiles = profiles;
+  } catch {
+    /* ignore */
+  }
+}
+
+async function refreshLinks() {
+  try {
+    const data = await api("/api/links");
+    const links = data.links || {};
+    if ($("#links-tiktok")) $("#links-tiktok").value = links.tiktok || "";
+    if ($("#links-github")) $("#links-github").value = links.github || "";
+    if ($("#links-discord")) $("#links-discord").value = links.discord || "";
+    const gh = $("#link-github");
+    const tt = $("#link-tiktok");
+    const dc = $("#link-discord");
+    if (gh && links.github) gh.href = links.github;
+    if (tt) {
+      if (links.tiktok) {
+        tt.href = links.tiktok;
+        tt.hidden = false;
+      } else tt.hidden = true;
+    }
+    if (dc) {
+      dc.href = links.discord || "https://discord.gg/rrQd6NKHbg";
+      dc.hidden = false;
+    }
+  } catch {
+    /* ignore */
+  }
+  try {
+    const dc = await api("/api/discord");
+    const input = $("#discord-webhook");
+    if (input && !input.value && dc.configured) {
+      input.placeholder = dc.url ? `Configuré · ${dc.url}` : "Webhook configuré";
+    }
+  } catch {
+    /* ignore */
+  }
+}
+
+async function refreshCompanion() {
+  try {
+    const data = await api("/api/companion");
+    if ($("#companion-enabled")) $("#companion-enabled").checked = !!data.enabled;
+    if ($("#companion-host") && data.host) $("#companion-host").value = data.host;
+    if ($("#companion-port") && data.port) $("#companion-port").value = String(data.port);
+    if ($("#companion-status")) {
+      $("#companion-status").textContent = data.enabled
+        ? `Companion ON → ${data.host || "(IP vide)"}:${data.port || 9123}`
+        : "Companion OFF — active pour pousser les transferts vers pixam-console.elf";
+    }
+  } catch (err) {
+    if ($("#companion-status")) $("#companion-status").textContent = err.message || "Companion indisponible";
+  }
+}
+
+async function saveCompanion() {
+  const enabled = !!$("#companion-enabled")?.checked;
+  let cHost = ($("#companion-host")?.value || "").trim();
+  const port = Number($("#companion-port")?.value || 9123);
+  if (enabled && !cHost) cHost = host();
+  const data = await api("/api/companion", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ enabled, host: cHost, port }),
+  });
+  toast(data.enabled ? "Companion enregistré" : "Companion désactivé");
+  await refreshCompanion();
 }
 
 async function refreshDeskInfo() {
@@ -188,6 +433,13 @@ async function refreshDeskInfo() {
         : ex.hint || "Aucun extracteur CLI détecté — brew install unar";
     }
     syncTokenField();
+    refreshCompanion().catch(() => {});
+    refreshHistory().catch(() => {});
+    refreshProfiles().catch(() => {});
+    refreshLinks().catch(() => {});
+    if ($("#link-advice") && data.link?.advice) {
+      $("#link-advice").textContent = data.link.advice;
+    }
     const link = $("#download-update-link");
     const preview = $("#update-manifest-preview");
     if (data.update?.version) {
@@ -249,9 +501,11 @@ function renderDoctor(doc) {
   if (doc.ftp_ok) {
     setChip("ok", `Connecté · ${doc.host}`);
     note.textContent = `FTP OK · ${doc.homebrew?.length || 0} élément(s) dans /data/homebrew`;
+    if ($("#hero-welcome")) $("#hero-welcome").hidden = true;
   } else {
     setChip("bad", "Connexion échouée");
     note.textContent = `Impossible de joindre FTP sur ${doc.host}`;
+    if ($("#hero-welcome")) $("#hero-welcome").hidden = false;
   }
 
   const warnings = $("#warnings");
@@ -1212,6 +1466,189 @@ async function sendSelectedElf() {
   }
 }
 
+async function refreshEden() {
+  const note = $("#eden-status-note");
+  try {
+    const [status, release] = await Promise.all([
+      api(`/api/eden/status?host=${encodeURIComponent(host())}`),
+      api("/api/eden/release").catch(() => null),
+    ]);
+    state.eden = status;
+    if ($("#eden-stat-installed")) {
+      $("#eden-stat-installed").textContent = status.installed ? "OK" : "—";
+    }
+    if ($("#eden-stat-keys")) {
+      const k = status.keys || {};
+      $("#eden-stat-keys").textContent = k.prod_keys ? (k.title_keys ? "2/2" : "1/2") : "0/2";
+    }
+    if ($("#eden-stat-roms")) $("#eden-stat-roms").textContent = String(status.roms_count || 0);
+    if (note) {
+      note.textContent = status.installed
+        ? `Installé · ${status.app_root} · firmware ${status.firmware?.count || 0} NCA · ${status.roms_count || 0} ROM(s)`
+        : `Pas encore installé — Installer / MAJ dépose ${status.title_id || "PPSA99008"} dans /data/homebrew`;
+    }
+    if ($("#eden-release-note") && release?.tag) {
+      $("#eden-release-note").textContent = `Release GitHub ${release.tag} · ${formatBytes(release.bytes || 0)}`;
+    }
+    if ($("#eden-github-link") && status.github) $("#eden-github-link").href = status.github;
+    const list = $("#eden-roms-list");
+    const roms = status.roms || [];
+    if ($("#eden-roms-count")) $("#eden-roms-count").textContent = String(roms.length);
+    if (list) {
+      if (!roms.length) {
+        list.innerHTML = `<li><span class="note">Aucune ROM · glisse des .nsp / .xci ci-dessus</span></li>`;
+      } else {
+        list.innerHTML = roms
+          .map(
+            (r) => `<li>
+              <span><strong>${escapeHtml(r.name)}</strong><br><span class="meta">${formatBytes(r.size)}</span></span>
+              <span class="btn-row">
+                <button type="button" class="btn ghost eden-open-rom" data-path="${escapeHtml(r.path)}">Fichiers</button>
+                <button type="button" class="btn ghost danger eden-del-rom" data-path="${escapeHtml(r.path)}">Suppr.</button>
+              </span>
+            </li>`
+          )
+          .join("");
+        list.querySelectorAll(".eden-open-rom").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const path = eden_mod_parent(btn.getAttribute("data-path"));
+            openFinderAt(path);
+          });
+        });
+        list.querySelectorAll(".eden-del-rom").forEach((btn) => {
+          btn.addEventListener("click", async () => {
+            if (!confirm(`Supprimer ${btn.getAttribute("data-path")} ?`)) return;
+            try {
+              await api("/api/eden/delete-rom", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ host: host(), path: btn.getAttribute("data-path") }),
+              });
+              toast("ROM supprimée");
+              refreshEden().catch(() => {});
+            } catch (err) {
+              toast(err.message);
+            }
+          });
+        });
+      }
+    }
+  } catch (err) {
+    if (note) note.textContent = err.message;
+  }
+}
+
+function eden_mod_parent(path) {
+  const p = String(path || "").replace(/\/[^/]+$/, "");
+  return p || "/data/homebrew/PPSA99008/assets/roms";
+}
+
+function openFinderAt(path) {
+  $$(".nav-item").forEach((t) => t.classList.toggle("active", t.dataset.tab === "files"));
+  $$(".panel").forEach((p) => p.classList.remove("active"));
+  $("#panel-files")?.classList.add("active");
+  navigateFinder(path).catch((e) => toast(e.message));
+}
+
+async function edenPushFiles(kind, files) {
+  if (!files?.length) return;
+  const dest = state.eden?.paths?.[kind];
+  if (!dest) {
+    await refreshEden();
+  }
+  const root = (state.eden?.paths && state.eden.paths[kind]) || {
+    keys: "/data/homebrew/PPSA99008/assets/keys",
+    firmware: "/data/homebrew/PPSA99008/assets/firmware",
+    roms: "/data/homebrew/PPSA99008/assets/roms",
+  }[kind];
+  if (!root) return toast("Destination inconnue");
+  try {
+    toast(`Envoi ${kind}…`);
+    await startBrowserTransfer([...files], root);
+    toast(`${kind} envoyé`);
+    refreshEden().catch(() => {});
+  } catch (err) {
+    toast(err.message);
+  }
+}
+
+async function refreshOrbit() {
+  const note = $("#orbit-status-note");
+  try {
+    const [status, release] = await Promise.all([
+      api(`/api/orbit/status?host=${encodeURIComponent(host())}`),
+      api("/api/orbit/release").catch(() => null),
+    ]);
+    state.orbit = status;
+    if ($("#orbit-stat-installed")) {
+      $("#orbit-stat-installed").textContent = status.elf || status.installed ? "OK" : "—";
+    }
+    if ($("#orbit-stat-online")) {
+      $("#orbit-stat-online").textContent = status.online ? "ON" : "off";
+    }
+    if (note) {
+      const elfBit = status.elf
+        ? `${status.elf.path} · ${formatBytes(status.elf.size)}`
+        : status.dir_present
+          ? `${status.orbit_dir} présent`
+          : "ELF non trouvé";
+      const ftpBit = status.ftp_error ? ` · FTP: ${status.ftp_error}` : "";
+      note.textContent = `${elfBit} · port ${status.port} ${status.online ? "ouvert" : "fermé"}${ftpBit}`;
+    }
+    if ($("#orbit-release-note") && release?.tag) {
+      $("#orbit-release-note").textContent = `Release ${release.tag} · ${formatBytes(release.bytes || 0)}${
+        release.sha256 ? ` · sha256 ${release.sha256.slice(0, 12)}…` : ""
+      }`;
+    }
+    const h = host();
+    const url = status.url || (h ? `http://${h}:34177/` : "");
+    state.orbit = { ...status, url };
+    const openBtn = $("#orbit-open-btn");
+    const copyBtn = $("#orbit-copy-url-btn");
+    const preview = $("#orbit-url-preview");
+    // Enable as soon as we have an IP — Orbit may still be starting
+    if (openBtn) openBtn.disabled = !url;
+    if (copyBtn) copyBtn.disabled = !url;
+    if (preview) {
+      preview.hidden = !url;
+      preview.textContent = url;
+    }
+  } catch (err) {
+    if (note) note.textContent = err.message;
+    const h = host();
+    const url = h ? `http://${h}:34177/` : "";
+    state.orbit = { ...(state.orbit || {}), url };
+    if ($("#orbit-open-btn")) $("#orbit-open-btn").disabled = !url;
+    if ($("#orbit-copy-url-btn")) $("#orbit-copy-url-btn").disabled = !url;
+  }
+}
+
+async function openExternal(url) {
+  const u = String(url || "").trim();
+  if (!u) throw new Error("URL vide");
+  // pywebview: window.open is often a no-op — prefer native bridge then Desk API
+  try {
+    if (window.pywebview?.api?.open_external) {
+      const res = await window.pywebview.api.open_external(u);
+      if (res?.ok) return true;
+    }
+  } catch (_) {
+    /* fall through */
+  }
+  try {
+    await api("/api/open-external", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: u }),
+    });
+    return true;
+  } catch (err) {
+    const w = window.open(u, "_blank", "noopener");
+    if (w) return true;
+    throw err;
+  }
+}
+
 $$(".nav-item").forEach((tab) => {
   tab.addEventListener("click", () => {
     $$(".nav-item").forEach((t) => t.classList.remove("active"));
@@ -1224,13 +1661,60 @@ $$(".nav-item").forEach((tab) => {
     if (tab.dataset.tab === "games") {
       refreshGames().catch((e) => toast(e.message));
     }
+    if (tab.dataset.tab === "eden") {
+      refreshEden().catch((e) => toast(e.message));
+    }
+    if (tab.dataset.tab === "orbit") {
+      refreshOrbit().catch((e) => toast(e.message));
+    }
     if (tab.dataset.tab === "elfs") {
       refreshElfs().catch((e) => toast(e.message));
     }
     if (tab.dataset.tab === "relapse") {
       refreshRelapse().catch((e) => toast(e.message));
     }
+    if (tab.dataset.tab === "settings") {
+      applyPrefsToForm(loadPrefs());
+      syncThemeLabels();
+    }
   });
+});
+
+$$(".theme-card").forEach((card) => {
+  card.addEventListener("click", () => {
+    setTheme(card.getAttribute("data-theme-id"));
+    toast(`Thème · ${THEME_LABELS[currentTheme()]}`);
+  });
+});
+$("#settings-xfer-dest")?.addEventListener("change", () => {
+  const wrap = $("#settings-xfer-custom-wrap");
+  if (wrap) wrap.hidden = $("#settings-xfer-dest").value !== "__custom__";
+});
+$("#settings-save-btn")?.addEventListener("click", () => {
+  const prefs = readSettingsForm();
+  savePrefs(prefs);
+  applyPrefsToApp(prefs, { connect: false });
+  if ($("#settings-status")) $("#settings-status").textContent = "Réglages enregistrés";
+  toast("Réglages enregistrés");
+});
+$("#settings-apply-btn")?.addEventListener("click", () => {
+  const prefs = readSettingsForm();
+  savePrefs(prefs);
+  applyPrefsToApp(prefs, { connect: false });
+  if ($("#settings-status")) $("#settings-status").textContent = "Appliqué à l’interface";
+  toast("Réglages appliqués");
+});
+$("#settings-reset-btn")?.addEventListener("click", () => {
+  localStorage.removeItem("pshd-prefs");
+  applyPrefsToForm({
+    host: localStorage.getItem("pshd-host") || "",
+    uiMode: "beginner",
+    xferDest: "/data/homebrew",
+    workers: 3,
+    autoConnect: false,
+  });
+  if ($("#settings-status")) $("#settings-status").textContent = "Préremplissage réinitialisé (thème inchangé)";
+  toast("Préremplissage réinitialisé");
 });
 
 $("#games-refresh-btn")?.addEventListener("click", () => refreshGames().catch((e) => toast(e.message)));
@@ -1245,10 +1729,135 @@ $("#games-open-folder-btn")?.addEventListener("click", () => {
   const game = state.gamesSelected;
   if (!game?.path) return;
   const path = game.kind === "image" ? game.path.replace(/\/[^/]+$/, "") || "/" : game.path;
-  $$(".nav-item").forEach((t) => t.classList.toggle("active", t.dataset.tab === "files"));
-  $$(".panel").forEach((p) => p.classList.remove("active"));
-  $("#panel-files")?.classList.add("active");
-  navigateFinder(path).catch((e) => toast(e.message));
+  openFinderAt(path);
+});
+$("#eden-refresh-btn")?.addEventListener("click", () => refreshEden().catch((e) => toast(e.message)));
+$("#eden-open-folder-btn")?.addEventListener("click", () => {
+  openFinderAt(state.eden?.app_root || "/data/homebrew/PPSA99008");
+});
+$("#eden-install-btn")?.addEventListener("click", async () => {
+  try {
+    toast("Téléchargement ProsperoEden…");
+    const data = await api("/api/eden/install", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ host: host() }),
+    });
+    if (data.job?.id) {
+      renderJob(data.job);
+      pollJob(data.job.id);
+    }
+    toast("Install Eden lancée");
+  } catch (err) {
+    toast(err.message);
+  }
+});
+$$("[data-eden-pick]").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const kind = btn.getAttribute("data-eden-pick");
+    const input = $(`#eden-${kind}-input`);
+    input?.click();
+  });
+});
+["keys", "firmware", "roms"].forEach((kind) => {
+  const input = $(`#eden-${kind}-input`);
+  input?.addEventListener("change", () => {
+    const files = [...(input.files || [])];
+    input.value = "";
+    edenPushFiles(kind, files);
+  });
+  const zone = $(`.hub-drop[data-eden-kind="${kind}"]`);
+  if (!zone) return;
+  ["dragenter", "dragover"].forEach((evt) => {
+    zone.addEventListener(evt, (e) => {
+      e.preventDefault();
+      zone.classList.add("drag");
+    });
+  });
+  ["dragleave", "drop"].forEach((evt) => {
+    zone.addEventListener(evt, (e) => {
+      e.preventDefault();
+      zone.classList.remove("drag");
+    });
+  });
+  zone.addEventListener("drop", (e) => {
+    const files = [...(e.dataTransfer?.files || [])];
+    edenPushFiles(kind, files);
+  });
+});
+$("#orbit-refresh-btn")?.addEventListener("click", () => refreshOrbit().catch((e) => toast(e.message)));
+$("#orbit-install-btn")?.addEventListener("click", async () => {
+  if (!host()) return toast("Renseigne l’IP PS5 puis Connecter");
+  const btn = $("#orbit-install-btn");
+  if (btn) btn.disabled = true;
+  try {
+    toast("Téléchargement Orbit (GitHub) puis upload FTP…");
+    if ($("#orbit-status-note")) {
+      $("#orbit-status-note").textContent = "Téléchargement orbit_store.elf en cours…";
+    }
+    const data = await api("/api/orbit/install", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ host: host(), force: false }),
+    });
+    if (data.warning) toast(data.warning);
+    if (data.job?.id) {
+      renderJob(data.job);
+      pollJob(data.job.id);
+      toast(`Upload → ${data.dest_root || "/data/orbit-store"} · ${formatBytes(data.bytes || 0)}`);
+    } else {
+      toast("Install Orbit lancée");
+    }
+  } catch (err) {
+    toast(err.message || "Échec install Orbit");
+    if ($("#orbit-status-note")) $("#orbit-status-note").textContent = err.message;
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+});
+$("#orbit-elfldr-btn")?.addEventListener("click", async () => {
+  if (!host()) return toast("Renseigne l’IP PS5 puis Connecter");
+  const btn = $("#orbit-elfldr-btn");
+  if (btn) btn.disabled = true;
+  try {
+    toast("Prépare orbit_store.elf puis envoi :9021…");
+    const data = await api("/api/orbit/elfldr", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ host: host(), port: 9021, force: false }),
+    });
+    toast(data.ok ? `Envoyé · ${formatBytes(data.bytes || 0)}` : data.error || "Échec");
+    refreshOrbit().catch(() => {});
+  } catch (err) {
+    toast(err.message);
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+});
+$("#orbit-open-btn")?.addEventListener("click", async () => {
+  const h = host();
+  const url = state.orbit?.url || (h ? `http://${h}:34177/` : "");
+  if (!url) return toast("Renseigne l’IP PS5 puis Connecter");
+  try {
+    if (state.orbit && state.orbit.online === false) {
+      toast("Orbit :34177 encore fermé — ouverture du navigateur quand même");
+    }
+    await openExternal(url);
+    toast(`Navigateur → ${url}`);
+  } catch (err) {
+    toast(err.message || "Impossible d’ouvrir le navigateur");
+  }
+});
+$("#orbit-copy-url-btn")?.addEventListener("click", async () => {
+  const h = host();
+  const url = state.orbit?.url || (h ? `http://${h}:34177/` : "");
+  if (!url) return toast("URL Orbit indisponible");
+  try {
+    await navigator.clipboard.writeText(url);
+    toast("URL copiée");
+  } catch {
+    toast(url);
+  }
 });
 $$(".games-tab").forEach((btn) => {
   btn.addEventListener("click", () => {
@@ -1574,6 +2183,17 @@ function renderJob(job) {
     const etaBit = formatEta(eta);
     note.textContent = `${phaseLabel(phase)} · ${job.current || "—"}${etaBit ? ` · reste ${etaBit}` : ""}`;
   }
+  const etaLine = $("#xfer-eta-line");
+  if (etaLine) {
+    const etaBit = formatEta(eta);
+    etaLine.hidden = !etaBit && job.status !== "paused";
+    etaLine.textContent =
+      job.status === "paused"
+        ? "En pause — Reprendre pour continuer (reprise FTP si partiel)"
+        : etaBit
+          ? `ETA ${etaBit} · ${job.mbps || 0} Mbps`
+          : "";
+  }
   $("#transfer-status").textContent =
     `status=${job.status}\n` +
     `phase=${phase}\n` +
@@ -1584,6 +2204,9 @@ function renderJob(job) {
     `workers=${job.workers}\n` +
     `current=${job.current || "-"}\n` +
     (job.errors?.length ? `errors:\n- ${job.errors.join("\n- ")}` : "errors=0");
+  const paused = job.status === "paused" || job.pause_requested;
+  if ($("#xfer-pause-btn")) $("#xfer-pause-btn").hidden = !state.transferJobId || paused || ["done", "done_with_errors", "error", "cancelled"].includes(job.status);
+  if ($("#xfer-resume-btn")) $("#xfer-resume-btn").hidden = !paused;
   state._xferKeepGlobal = !["done", "done_with_errors", "error", "cancelled"].includes(job.status);
   updateGlobalXfer(job);
   if (!state._xferKeepGlobal) {
@@ -1591,6 +2214,7 @@ function renderJob(job) {
       state._xferKeepGlobal = false;
       updateGlobalXfer(null);
     }, 3500);
+    refreshHistory().catch(() => {});
   }
 }
 
@@ -1609,7 +2233,12 @@ async function pollJob(id) {
         else if (data.job.status === "cancelled") toast("Transfert annulé");
         else toast("Transfert terminé avec erreurs");
         refreshHomebrew().catch(() => {});
+        refreshHistory().catch(() => {});
+        refreshEden().catch(() => {});
+        refreshOrbit().catch(() => {});
         if ($("#xfer-cancel-btn")) $("#xfer-cancel-btn").hidden = true;
+        if ($("#xfer-pause-btn")) $("#xfer-pause-btn").hidden = true;
+        if ($("#xfer-resume-btn")) $("#xfer-resume-btn").hidden = true;
       } else if ($("#xfer-cancel-btn")) {
         $("#xfer-cancel-btn").hidden = false;
       }
@@ -1972,6 +2601,134 @@ $("#xfer-cancel-btn")?.addEventListener("click", async () => {
     });
     if (data.job) renderJob(data.job);
     toast("Annulation demandée…");
+  } catch (err) {
+    toast(err.message);
+  }
+});
+$("#xfer-pause-btn")?.addEventListener("click", async () => {
+  const id = state.transferJobId || state.transferJob?.id;
+  if (!id) return;
+  try {
+    const data = await api("/api/transfer/pause", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+    if (data.job) renderJob(data.job);
+    toast("Pause");
+  } catch (err) {
+    toast(err.message);
+  }
+});
+$("#xfer-resume-btn")?.addEventListener("click", async () => {
+  const id = state.transferJobId || state.transferJob?.id;
+  if (!id) return;
+  try {
+    const data = await api("/api/transfer/resume", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+    if (data.job) renderJob(data.job);
+    toast("Reprise");
+  } catch (err) {
+    toast(err.message);
+  }
+});
+$("#xfer-history-clear")?.addEventListener("click", async () => {
+  try {
+    await api("/api/transfer/history/clear", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
+    refreshHistory().catch(() => {});
+    toast("Historique vidé");
+  } catch (err) {
+    toast(err.message);
+  }
+});
+$("#ui-mode-select")?.addEventListener("change", () => applyUiMode($("#ui-mode-select").value));
+$("#profile-select")?.addEventListener("change", () => {
+  const name = $("#profile-select")?.value;
+  const p = (state.profiles || []).find((x) => x.name === name);
+  if (!p) return;
+  if ($("#host")) $("#host").value = p.host || "";
+  localStorage.setItem("pshd-host", p.host || "");
+  if (p.dest_root && $("#xfer-dest-preset")) {
+    const opt = [...$("#xfer-dest-preset").options].find((o) => o.value === p.dest_root);
+    if (opt) $("#xfer-dest-preset").value = p.dest_root;
+    else {
+      $("#xfer-dest-preset").value = "__custom__";
+      if ($("#xfer-dest-custom-wrap")) $("#xfer-dest-custom-wrap").hidden = false;
+      if ($("#xfer-dest-custom")) $("#xfer-dest-custom").value = p.dest_root;
+    }
+  }
+  toast(`Profil ${p.name}`);
+});
+$("#profile-save-btn")?.addEventListener("click", async () => {
+  const name = prompt("Nom du profil", $("#profile-select")?.value || "PS5");
+  if (!name) return;
+  const profiles = [...(state.profiles || [])];
+  const row = {
+    name: name.trim(),
+    host: host(),
+    companion: !!$("#companion-enabled")?.checked,
+    dest_root: xferDestRoot() || "/data/homebrew",
+  };
+  const idx = profiles.findIndex((p) => p.name === row.name);
+  if (idx >= 0) profiles[idx] = row;
+  else profiles.push(row);
+  try {
+    await api("/api/profiles", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ profiles, active: row.name }),
+    });
+    await refreshProfiles();
+    toast("Profil sauvé");
+  } catch (err) {
+    toast(err.message);
+  }
+});
+$("#profile-delete-btn")?.addEventListener("click", async () => {
+  const name = $("#profile-select")?.value;
+  if (!name) return toast("Aucun profil");
+  const profiles = (state.profiles || []).filter((p) => p.name !== name);
+  try {
+    await api("/api/profiles", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ profiles, active: "" }),
+    });
+    await refreshProfiles();
+    toast("Profil supprimé");
+  } catch (err) {
+    toast(err.message);
+  }
+});
+$("#links-save-btn")?.addEventListener("click", async () => {
+  try {
+    await api("/api/links", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        tiktok: $("#links-tiktok")?.value || "",
+        github: $("#links-github")?.value || "",
+        discord: $("#links-discord")?.value || "",
+      }),
+    });
+    await refreshLinks();
+    if ($("#links-status")) $("#links-status").textContent = "Liens enregistrés";
+    toast("Liens enregistrés");
+  } catch (err) {
+    toast(err.message);
+  }
+});
+$("#discord-webhook-save")?.addEventListener("click", async () => {
+  try {
+    await api("/api/discord", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: $("#discord-webhook")?.value || "" }),
+    });
+    toast("Webhook Discord sauvé");
   } catch (err) {
     toast(err.message);
   }
@@ -3476,6 +4233,36 @@ $("#copy-lan-url")?.addEventListener("click", async () => {
   }
 });
 $("#refresh-desk-info")?.addEventListener("click", () => refreshDeskInfo().catch((e) => toast(e.message)));
+$("#companion-save-btn")?.addEventListener("click", () => saveCompanion().catch((e) => toast(e.message)));
+$("#companion-use-ps5-btn")?.addEventListener("click", () => {
+  if ($("#companion-host")) $("#companion-host").value = host();
+  toast("IP PS5 copiée dans companion");
+});
+$("#companion-enabled")?.addEventListener("change", () => {
+  if ($("#companion-enabled").checked && !$("#companion-host")?.value?.trim() && $("#companion-host")) {
+    $("#companion-host").value = host();
+  }
+});
+$("#companion-send-elf-btn")?.addEventListener("click", async () => {
+  const h = host();
+  if (!h) return toast("Renseigne l’IP PS5");
+  try {
+    toast("Envoi pixam-console.elf → :9021…");
+    const data = await api("/api/elfldr/send", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ host: h, filename: "pixam-console.elf" }),
+    });
+    toast(data.ok ? "pixam-console.elf envoyé" : data.error || "Échec envoi");
+    if (!$("#companion-enabled")?.checked) {
+      if ($("#companion-enabled")) $("#companion-enabled").checked = true;
+      if ($("#companion-host") && !$("#companion-host").value.trim()) $("#companion-host").value = h;
+      await saveCompanion().catch(() => {});
+    }
+  } catch (err) {
+    toast(err.message || "Place pixam-console.elf dans payloads/ puis rebuild");
+  }
+});
 $("#save-desk-token")?.addEventListener("click", () => {
   const v = ($("#desk-token-input")?.value || "").trim();
   if (v) localStorage.setItem("pshd-token", v);
@@ -3518,9 +4305,14 @@ $("#publish-update-btn")?.addEventListener("click", async () => {
     const data = await api("/api/desk/publish-update", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ notes }),
+      body: JSON.stringify({ notes, discord: true }),
     });
-    toast(`Update v${data.manifest?.version || "?"} publiée`);
+    const dc = data.discord || {};
+    let msg = `Update v${data.manifest?.version || "?"} publiée`;
+    if (dc.ok) msg += " · Discord OK";
+    else if (dc.skipped) msg += " · Discord non configuré";
+    else if (dc.error) msg += ` · Discord: ${dc.error}`;
+    toast(msg);
     await refreshDeskInfo();
   } catch (err) {
     toast(err.message);
@@ -3531,9 +4323,32 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/sw.js").catch(() => {});
 }
 
-syncTokenField();
-syncHenAutoUi([]);
-refreshDeskInfo().catch(() => {});
-refreshCatalog().catch(() => {});
-refreshRelapse().catch(() => {});
-ensureAutoHenPolling();
+{
+  const prefs = loadPrefs();
+  // Seed settings form + migrate legacy host
+  if (!prefs.host && localStorage.getItem("pshd-host")) {
+    prefs.host = localStorage.getItem("pshd-host");
+  }
+  if (!prefs.uiMode) prefs.uiMode = localStorage.getItem("pshd-ui-mode") || "beginner";
+  applyPrefsToForm(prefs);
+  applyUiMode(prefs.uiMode || "beginner");
+  applyPrefsToApp(prefs, { connect: false });
+  setTheme(currentTheme());
+  // Prefill host input immediately
+  if (prefs.host && $("#host")) $("#host").value = prefs.host;
+  else if (localStorage.getItem("pshd-host") && $("#host")) {
+    $("#host").value = localStorage.getItem("pshd-host");
+  }
+  syncTokenField();
+  syncHenAutoUi([]);
+  refreshDeskInfo().catch(() => {});
+  refreshCatalog().catch(() => {});
+  refreshRelapse().catch(() => {});
+  refreshHistory().catch(() => {});
+  refreshProfiles().catch(() => {});
+  refreshLinks().catch(() => {});
+  ensureAutoHenPolling();
+  if (prefs.autoConnect && (prefs.host || host())) {
+    setTimeout(() => connect().catch((e) => toast(e.message)), 450);
+  }
+}

@@ -15,6 +15,7 @@ import tempfile
 import threading
 import time
 import urllib.request
+import webbrowser
 from datetime import datetime, timezone
 from ftplib import FTP, error_perm
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -27,6 +28,11 @@ from desk import transfer as xfer
 from desk import relapse as relapse_host
 from desk import games as games_mod
 from desk import elfs as elfs_mod
+from desk import companion as companion_mod
+from desk import history as history_mod
+from desk import discord_hook as discord_mod
+from desk import eden as eden_mod
+from desk import orbit as orbit_mod
 from desk.common import (
     UPDATES_DIR,
     configure_stdio,
@@ -626,6 +632,18 @@ class DeskHandler(SimpleHTTPRequestHandler):
         if path == "/api/elfs/info":
             return self._handle_elfs_info(host, qs)
 
+        if path == "/api/eden/status":
+            return self._handle_eden_status(host)
+
+        if path == "/api/eden/release":
+            return self._handle_eden_release()
+
+        if path == "/api/orbit/status":
+            return self._handle_orbit_status(host)
+
+        if path == "/api/orbit/release":
+            return self._handle_orbit_release()
+
         if path == "/api/desk/update/manifest":
             manifest = read_update_manifest()
             if not manifest:
@@ -685,6 +703,33 @@ class DeskHandler(SimpleHTTPRequestHandler):
             if not job:
                 return self._error("Job introuvable", status=404)
             return self._json({"ok": True, "job": job.snapshot()})
+
+        if path == "/api/transfer/jobs":
+            try:
+                limit = int((qs.get("limit") or ["40"])[0])
+            except ValueError:
+                limit = 40
+            return self._json({"ok": True, "jobs": xfer.list_jobs(limit=limit)})
+
+        if path == "/api/transfer/history":
+            try:
+                limit = int((qs.get("limit") or ["40"])[0])
+            except ValueError:
+                limit = 40
+            return self._json({"ok": True, "history": history_mod.list_history(limit=limit)})
+
+        if path == "/api/profiles":
+            return self._json({"ok": True, **history_mod.get_profiles_bundle()})
+
+        if path == "/api/links":
+            return self._json({"ok": True, "links": history_mod.get_community_links()})
+
+        if path == "/api/discord":
+            wh = discord_mod.get_webhook()
+            return self._json({"ok": True, "configured": bool(wh), "url": wh[:48] + ("…" if len(wh) > 48 else "")})
+
+        if path == "/api/companion":
+            return self._json(companion_mod.status_payload())
 
         if path == "/api/fs/list":
             return self._handle_fs_list(host, qs)
@@ -765,6 +810,33 @@ class DeskHandler(SimpleHTTPRequestHandler):
         if path == "/api/transfer/cancel":
             return self._handle_transfer_cancel()
 
+        if path == "/api/transfer/pause":
+            return self._handle_transfer_pause()
+
+        if path == "/api/transfer/resume":
+            return self._handle_transfer_resume()
+
+        if path == "/api/transfer/retry":
+            return self._handle_transfer_retry()
+
+        if path == "/api/transfer/history/clear":
+            if not self._is_local_client():
+                return self._error("Réservé au réseau de confiance", status=403)
+            history_mod.clear_history()
+            return self._json({"ok": True})
+
+        if path == "/api/profiles":
+            return self._handle_profiles_save()
+
+        if path == "/api/links":
+            return self._handle_links_save()
+
+        if path == "/api/discord":
+            return self._handle_discord_save()
+
+        if path == "/api/companion":
+            return self._handle_companion_config()
+
         if path == "/api/relapse/setup":
             return self._handle_relapse_setup()
 
@@ -788,6 +860,24 @@ class DeskHandler(SimpleHTTPRequestHandler):
 
         if path == "/api/elfs/update":
             return self._handle_elfs_update()
+
+        if path == "/api/eden/install":
+            return self._handle_eden_install()
+
+        if path == "/api/eden/push":
+            return self._handle_eden_push()
+
+        if path == "/api/eden/delete-rom":
+            return self._handle_eden_delete_rom()
+
+        if path == "/api/orbit/install":
+            return self._handle_orbit_install()
+
+        if path == "/api/orbit/elfldr":
+            return self._handle_orbit_elfldr()
+
+        if path == "/api/open-external":
+            return self._handle_open_external()
 
         if path == "/api/fs/mkdir":
             return self._handle_fs_mkdir()
@@ -1171,7 +1261,128 @@ class DeskHandler(SimpleHTTPRequestHandler):
         job = xfer.cancel_job(job_id)
         if not job:
             return self._error("Job introuvable", status=404)
+        try:
+            companion_mod.notify_job_obj(job, force=True)
+        except Exception:
+            pass
         return self._json({"ok": True, "job": job.snapshot(), "cancel_requested": True})
+
+    def _handle_transfer_pause(self) -> None:
+        if not self._is_local_client():
+            return self._error("Pause réservée au réseau de confiance", status=403)
+        try:
+            body = self._read_json()
+        except Exception:
+            return self._error("Invalid JSON")
+        job = xfer.pause_job(str(body.get("id") or "").strip())
+        if not job:
+            return self._error("Job introuvable", status=404)
+        return self._json({"ok": True, "job": job.snapshot()})
+
+    def _handle_transfer_resume(self) -> None:
+        if not self._is_local_client():
+            return self._error("Reprise réservée au réseau de confiance", status=403)
+        try:
+            body = self._read_json()
+        except Exception:
+            return self._error("Invalid JSON")
+        job = xfer.resume_job(str(body.get("id") or "").strip())
+        if not job:
+            return self._error("Job introuvable", status=404)
+        return self._json({"ok": True, "job": job.snapshot()})
+
+    def _handle_transfer_retry(self) -> None:
+        if not self._is_local_client():
+            return self._error("Retry réservé au réseau de confiance", status=403)
+        try:
+            body = self._read_json()
+        except Exception:
+            return self._error("Invalid JSON")
+        # Prefer explicit payload; else look up history / live job
+        host = (body.get("host") or DEFAULT_HOST or "").strip()
+        paths = body.get("paths") or []
+        dest_root = (body.get("dest_root") or HOMEBREW_DIR).strip()
+        url = (body.get("url") or "").strip()
+        job_id = str(body.get("id") or "").strip()
+        if job_id and (not paths and not url):
+            live = xfer.get_job(job_id)
+            snap = live.snapshot() if live else None
+            if not snap:
+                for row in history_mod.list_history(80):
+                    if row.get("id") == job_id:
+                        snap = row
+                        break
+            if snap:
+                host = host or str(snap.get("host") or "")
+                paths = snap.get("source_paths") or []
+                dest_root = str(snap.get("dest_root") or dest_root)
+                url = str(snap.get("source_url") or "")
+        try:
+            if url:
+                job = xfer.start_url_transfer(host, url, dest_root=dest_root)
+            else:
+                if not isinstance(paths, list) or not paths:
+                    return self._error("Rien à relancer (pas de chemins / URL)")
+                job = xfer.start_transfer(host, [str(p) for p in paths], dest_root=dest_root)
+            return self._json({"ok": True, "job": job.snapshot()})
+        except Exception as exc:  # noqa: BLE001
+            return self._error(str(exc), status=502)
+
+    def _handle_profiles_save(self) -> None:
+        if not self._is_local_client():
+            return self._error("Profils réservés au réseau de confiance", status=403)
+        try:
+            body = self._read_json()
+        except Exception:
+            return self._error("Invalid JSON")
+        profiles = body.get("profiles") if isinstance(body.get("profiles"), list) else []
+        active = str(body.get("active") or "")
+        saved = history_mod.save_profiles(profiles, active=active)
+        return self._json({"ok": True, **saved})
+
+    def _handle_links_save(self) -> None:
+        if not self._is_local_client():
+            return self._error("Liens réservés au réseau de confiance", status=403)
+        try:
+            body = self._read_json()
+        except Exception:
+            return self._error("Invalid JSON")
+        links = history_mod.save_community_links(
+            tiktok=str(body.get("tiktok") or ""),
+            github=str(body.get("github") or ""),
+            discord=str(body.get("discord") or ""),
+        )
+        return self._json({"ok": True, "links": links})
+
+    def _handle_discord_save(self) -> None:
+        if not self._is_local_client():
+            return self._error("Discord réservé au réseau de confiance", status=403)
+        try:
+            body = self._read_json()
+        except Exception:
+            return self._error("Invalid JSON")
+        url = discord_mod.save_webhook(str(body.get("url") or ""))
+        return self._json({"ok": True, "configured": bool(url)})
+
+    def _handle_companion_config(self) -> None:
+        if not self._is_local_client():
+            return self._error("Companion réservé au réseau de confiance", status=403)
+        try:
+            body = self._read_json()
+        except Exception:
+            return self._error("Invalid JSON")
+        enabled = body.get("enabled")
+        host = body.get("host")
+        port = body.get("port")
+        # Default host to console IP from request/body if enabling without host
+        if host is None and body.get("use_console_host"):
+            host = (body.get("console_host") or DEFAULT_HOST or "").strip()
+        cfg = companion_mod.save_config(
+            enabled=None if enabled is None else bool(enabled),
+            host=None if host is None else str(host),
+            port=None if port is None else port,
+        )
+        return self._json({"ok": True, **companion_mod.status_payload(), "saved": cfg})
 
     def _handle_transfer_local(self) -> None:
         if not self._is_local_client():
@@ -1256,8 +1467,16 @@ class DeskHandler(SimpleHTTPRequestHandler):
                 job.sent_bytes += n
                 job.upload_bytes += n
                 job.current = f"{Path(rel).name} · {job.upload_bytes}/{job.upload_total}"
+            try:
+                companion_mod.notify_job_obj(job, force=False)
+            except Exception:
+                pass
 
         try:
+            try:
+                companion_mod.notify_job_obj(job, force=True)
+            except Exception:
+                pass
             sent = xfer.upload_stream(
                 host,
                 remote,
@@ -1271,6 +1490,10 @@ class DeskHandler(SimpleHTTPRequestHandler):
                     job.phase = "error"
                     job.errors.append("Upload incomplet")
                     job.finished_at = time.time()
+                try:
+                    companion_mod.notify_job_obj(job, force=True)
+                except Exception:
+                    pass
                 return self._error("Upload incomplet", status=400)
             with job._lock:
                 job.status = "done"
@@ -1279,6 +1502,14 @@ class DeskHandler(SimpleHTTPRequestHandler):
                 job.upload_bytes = max(job.upload_bytes, length)
                 job.sent_bytes = max(job.sent_bytes, length)
                 job.finished_at = time.time()
+            try:
+                companion_mod.notify_job_obj(job, force=True)
+            except Exception:
+                pass
+            try:
+                xfer._finish_job_side_effects(job)
+            except Exception:
+                pass
             return self._json(
                 {
                     "ok": True,
@@ -1388,7 +1619,224 @@ class DeskHandler(SimpleHTTPRequestHandler):
             from desk.update_channel import build_update_zip
 
             manifest = build_update_zip(notes=notes)
-            return self._json({"ok": True, "manifest": manifest})
+            discord_result = {}
+            if body.get("discord", True):
+                try:
+                    discord_result = discord_mod.post_update(manifest)
+                except Exception as exc:  # noqa: BLE001
+                    discord_result = {"ok": False, "error": str(exc)}
+            return self._json({"ok": True, "manifest": manifest, "discord": discord_result})
+        except Exception as exc:  # noqa: BLE001
+            return self._error(str(exc), status=502)
+
+    def _handle_eden_status(self, host: str) -> None:
+        try:
+            with ftp_connect(host) as ftp:
+                return self._json(eden_mod.status(ftp))
+        except Exception as exc:  # noqa: BLE001
+            return self._error(str(exc), status=502)
+
+    def _handle_eden_release(self) -> None:
+        try:
+            return self._json(eden_mod.latest_release())
+        except Exception as exc:  # noqa: BLE001
+            return self._error(str(exc), status=502)
+
+    def _handle_eden_install(self) -> None:
+        if not self._is_local_client():
+            return self._error("Install Eden réservée au réseau de confiance", status=403)
+        try:
+            body = self._read_json()
+        except Exception:
+            body = {}
+        host = (body.get("host") or DEFAULT_HOST or "").strip()
+        if not host:
+            return self._error("IP console manquante")
+        try:
+            rel = eden_mod.latest_release()
+            url = str(body.get("url") or rel.get("url") or "").strip()
+            filename = str(body.get("filename") or rel.get("filename") or "ProsperoEden.zip")
+            if not url:
+                return self._error("URL release introuvable")
+            job = xfer.start_url_transfer(
+                host,
+                url,
+                filename=filename,
+                dest_root=HOMEBREW_DIR,
+                extract=True,
+            )
+            return self._json({"ok": True, "job": job.snapshot(), "release": rel})
+        except Exception as exc:  # noqa: BLE001
+            return self._error(str(exc), status=502)
+
+    def _handle_eden_push(self) -> None:
+        if not self._is_local_client():
+            return self._error("Push Eden réservé au réseau de confiance", status=403)
+        try:
+            body = self._read_json()
+        except Exception:
+            return self._error("Invalid JSON")
+        host = (body.get("host") or DEFAULT_HOST or "").strip()
+        kind = str(body.get("kind") or "").strip().lower()
+        paths = body.get("paths") if isinstance(body.get("paths"), list) else []
+        if not host:
+            return self._error("IP console manquante")
+        try:
+            dest = assert_writable_path(eden_mod.dest_for_kind(kind))
+            clean = eden_mod.validate_paths_for_kind(kind, [str(p) for p in paths])
+            job = xfer.start_transfer(host, clean, dest_root=dest)
+            return self._json({"ok": True, "job": job.snapshot(), "dest_root": dest, "kind": kind})
+        except Exception as exc:  # noqa: BLE001
+            return self._error(str(exc), status=502)
+
+    def _handle_eden_delete_rom(self) -> None:
+        if not self._is_local_client():
+            return self._error("Suppression réservée au réseau de confiance", status=403)
+        try:
+            body = self._read_json()
+        except Exception:
+            return self._error("Invalid JSON")
+        host = (body.get("host") or DEFAULT_HOST or "").strip()
+        try:
+            remote = eden_mod.assert_rom_path(str(body.get("path") or ""))
+            remote = assert_writable_path(remote)
+        except (ValueError, PermissionError) as exc:
+            return self._error(str(exc))
+        try:
+            with ftp_connect(host) as ftp:
+                ftp_delete(ftp, remote, is_dir=False)
+            return self._json({"ok": True, "path": remote})
+        except Exception as exc:  # noqa: BLE001
+            return self._error(str(exc), status=502)
+
+    def _handle_orbit_status(self, host: str) -> None:
+        try:
+            with ftp_connect(host) as ftp:
+                return self._json(orbit_mod.status(ftp, host))
+        except Exception as exc:  # noqa: BLE001
+            # FTP down — still report web port if possible
+            online = orbit_mod.probe_port(host) if host else False
+            return self._json(
+                {
+                    "ok": True,
+                    "ftp_error": str(exc),
+                    "installed": False,
+                    "dir_present": False,
+                    "elf": None,
+                    "port": orbit_mod.ORBIT_PORT,
+                    "online": online,
+                    "url": f"http://{host}:{orbit_mod.ORBIT_PORT}/" if host else "",
+                    "orbit_dir": orbit_mod.ORBIT_DIR,
+                    "elf_path": orbit_mod.ORBIT_ELF_PATH,
+                    "github": f"https://github.com/{orbit_mod.GITHUB_REPO}",
+                }
+            )
+
+    def _handle_orbit_release(self) -> None:
+        try:
+            return self._json(orbit_mod.latest_release())
+        except Exception as exc:  # noqa: BLE001
+            return self._error(str(exc), status=502)
+
+    def _handle_open_external(self) -> None:
+        """Open http(s) URL in the OS default browser (Desk window can't window.open)."""
+        if not self._is_local_client():
+            return self._error("Ouverture réservée au réseau de confiance", status=403)
+        try:
+            body = self._read_json()
+        except Exception:
+            return self._error("Invalid JSON")
+        url = str(body.get("url") or "").strip()
+        parsed = urlparse(url)
+        if parsed.scheme not in ("http", "https") or not parsed.netloc:
+            return self._error("URL http(s) requise")
+        host_l = (parsed.hostname or "").lower()
+        # Allow LAN console / local only — block obvious SSRF to metadata
+        if host_l in ("metadata.google.internal",) or host_l.startswith("169.254.169.254"):
+            return self._error("URL non autorisée")
+        try:
+            opened = webbrowser.open(url)
+            if not opened:
+                plat = sys.platform
+                if plat == "darwin":
+                    import subprocess
+
+                    subprocess.run(["open", url], check=False)
+                    opened = True
+                elif plat.startswith("win"):
+                    os.startfile(url)  # type: ignore[attr-defined]
+                    opened = True
+            return self._json({"ok": True, "opened": bool(opened), "url": url})
+        except Exception as exc:  # noqa: BLE001
+            return self._error(str(exc), status=502)
+
+    def _handle_orbit_install(self) -> None:
+        if not self._is_local_client():
+            return self._error("Install Orbit réservée au réseau de confiance", status=403)
+        try:
+            body = self._read_json()
+        except Exception:
+            body = {}
+        host = (body.get("host") or DEFAULT_HOST or "").strip()
+        if not host:
+            return self._error("IP console manquante — Connecter d’abord")
+        force = bool(body.get("force"))
+        try:
+            local_elf, rel = orbit_mod.ensure_local_elf(PAYLOADS_DIR, force=force)
+        except Exception as exc:  # noqa: BLE001
+            return self._error(f"Téléchargement Orbit: {exc}", status=502)
+        warning = ""
+        dest = orbit_mod.ORBIT_DIR
+        try:
+            dest = assert_writable_path(dest)
+            job = xfer.start_transfer(host, [str(local_elf)], dest_root=dest, workers=1)
+        except Exception as exc:  # noqa: BLE001
+            # Fallback: /data/homebrew if orbit-store path rejected / FTP mkdir fails at start
+            try:
+                dest = assert_writable_path(orbit_mod.ORBIT_FALLBACK_DIR)
+                job = xfer.start_transfer(host, [str(local_elf)], dest_root=dest, workers=1)
+                warning = f"Fallback → {dest} ({exc})"
+            except Exception as exc2:  # noqa: BLE001
+                return self._error(f"Upload Orbit: {exc2}", status=502)
+        return self._json(
+            {
+                "ok": True,
+                "job": job.snapshot(),
+                "release": rel,
+                "dest_root": dest,
+                "local": str(local_elf),
+                "bytes": local_elf.stat().st_size,
+                "warning": warning,
+            }
+        )
+
+    def _handle_orbit_elfldr(self) -> None:
+        if not self._is_local_client():
+            return self._error("elfldr réservé au réseau de confiance", status=403)
+        try:
+            body = self._read_json()
+        except Exception:
+            body = {}
+        host = (body.get("host") or DEFAULT_HOST or "").strip()
+        if not host:
+            return self._error("IP console manquante — Connecter d’abord")
+        port = int(body.get("port") or ELFLDR_PORT)
+        force = bool(body.get("force"))
+        filename = orbit_mod.ORBIT_ELF_NAME
+        try:
+            local_elf, rel = orbit_mod.ensure_local_elf(PAYLOADS_DIR, force=force)
+            data = local_elf.read_bytes()
+            result = send_elf_to_loader(host, data, port=port)
+            return self._json(
+                {
+                    "ok": True,
+                    "send": result,
+                    "filename": filename,
+                    "bytes": len(data),
+                    "release": rel,
+                    "local": str(local_elf),
+                }
+            )
         except Exception as exc:  # noqa: BLE001
             return self._error(str(exc), status=502)
 
