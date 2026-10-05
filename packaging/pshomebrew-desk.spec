@@ -1,22 +1,31 @@
 # -*- mode: python ; coding: utf-8 -*-
-# Build on Windows:
-#   pyinstaller packaging/pshomebrew-desk.spec
+# Build on Windows (from repo root):
+#   python -m PyInstaller --noconfirm packaging/pshomebrew-desk.spec
 # Output: dist/PSHomebrewDesk/PSHomebrewDesk.exe
 
+import os
+
 block_cipher = None
+# SPECPATH = packaging/ → project root is parent
+ROOT = os.path.abspath(os.path.join(SPECPATH, '..'))
+
+
+def R(*parts):
+    return os.path.join(ROOT, *parts)
+
 
 a = Analysis(
-    ['desktop.py'],
-    pathex=[],
+    [R('desktop.py')],
+    pathex=[ROOT],
     binaries=[],
     datas=[
-        ('static', 'static'),
-        ('catalog/default.json', 'catalog'),
-        ('version.json', '.'),
-        ('assets/AppIcon.ico', 'assets'),
-        ('assets/icon.png', 'assets'),
-        ('assets/logo.png', 'assets'),
-        ('payloads/README.txt', 'payloads'),
+        (R('static'), 'static'),
+        (R('catalog', 'default.json'), 'catalog'),
+        (R('version.json'), '.'),
+        (R('assets', 'AppIcon.ico'), 'assets'),
+        (R('assets', 'icon.png'), 'assets'),
+        (R('assets', 'logo.png'), 'assets'),
+        (R('payloads', 'README.txt'), 'payloads'),
     ],
     hiddenimports=[
         'app',
@@ -64,7 +73,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='assets/AppIcon.ico',
+    icon=R('assets', 'AppIcon.ico'),
 )
 
 coll = COLLECT(
